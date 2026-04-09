@@ -1,0 +1,20 @@
+[
+  {
+    "id": "1768472463612",
+    "name": "Cek Nominal OT",
+    "message": "🔔 Info OT\n\nUdah cair ya guys. Tolong crosscheck rekening kalian, harusnya masuk segini: [total_ot].\nperiode : [periode]\n\nInfoin kalo ada selisih. Thanks! 🙏",
+    "schedule": {
+      "type": "weekly_day",
+      "time": "08:00",
+      "day": "Jumat"
+    },
+    "targets": {
+      "user_ids": [
+        "1768365888678"
+      ]
+    },
+    "enabled": false,
+    "created_at": "2026-01-15T10:21:03.613Z",
+    "last_run": null
+  }
+]

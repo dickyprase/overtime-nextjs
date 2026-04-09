@@ -1,0 +1,33 @@
+[
+  {
+    "id": "1",
+    "username": "admin",
+    "password": "admin123",
+    "role": "admin",
+    "name": "Administrator",
+    "telegram_id": "6751182308",
+    "salary": 0,
+    "mealAllowance": 0
+  },
+  {
+    "id": "1768365888678",
+    "username": "dicky",
+    "password": "123",
+    "name": "Dicky",
+    "role": "user",
+    "telegram_id": "584847845",
+    "salary": 5307094,
+    "mealAllowance": 30000,
+    "phone": "6289685259671"
+  },
+  {
+    "id": "1768384735874",
+    "username": "bram",
+    "password": "123",
+    "name": "bram",
+    "role": "user",
+    "telegram_id": "7219359227",
+    "salary": 5307094,
+    "mealAllowance": 30000
+  }
+]

@@ -1,0 +1,3845 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Karyawan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            /* Light Mode - Soft Blue Theme */
+            --bg-primary: #f0f7ff;
+            --bg-secondary: #ffffff;
+            --bg-glass: rgba(255, 255, 255, 0.85);
+            --bg-card: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border-color: #e2e8f0;
+            --accent-primary: #3b82f6;
+            --accent-secondary: #60a5fa;
+            --accent-light: rgba(59, 130, 246, 0.1);
+            --sidebar-start: #1e40af;
+            --sidebar-end: #3b82f6;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 10px 40px -10px rgba(0, 0, 0, 0.12);
+            --gradient-page: linear-gradient(135deg, #f0f7ff 0%, #e0f2fe 50%, #ecfeff 100%);
+        }
+
+        [data-theme="dark"] {
+            /* Dark Mode - Modern Sleek Dark Blue */
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #0f1729;
+            --bg-glass: rgba(15, 23, 42, 0.95);
+            --bg-card: #1e293b;
+            --bg-card-hover: #263548;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-color: #334155;
+            --accent-primary: #60a5fa;
+            --accent-secondary: #3b82f6;
+            --accent-light: rgba(96, 165, 250, 0.2);
+            --sidebar-start: #0f172a;
+            --sidebar-end: #1e3a5f;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+            --shadow-lg: 0 10px 40px -10px rgba(0, 0, 0, 0.6);
+            --gradient-page: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        }
+
+        * {
+            font-family: 'Inter', sans-serif;
+            box-sizing: border-box;
+            transition: background-color 0.3s ease, border-color 0.3s ease, color 0.2s ease;
+        }
+
+        html,
+        body {
+            overflow-x: hidden;
+            max-width: 100vw;
+            background: var(--gradient-page);
+            color: var(--text-primary);
+        }
+
+        body {
+            min-height: 100vh;
+        }
+
+        .glass {
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+        }
+
+        .sidebar {
+            background: linear-gradient(180deg, var(--sidebar-start) 0%, var(--sidebar-end) 100%);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px -5px rgba(59, 130, 246, 0.4);
+        }
+
+        .nav-link {
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(4px);
+        }
+
+        input,
+        select,
+        textarea {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border-color: var(--border-color);
+            transition: all 0.25s ease;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 4px var(--accent-light);
+        }
+
+        .status-cair {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .status-belum {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .status-mismatch {
+            background: #fed7aa;
+            color: #c2410c;
+        }
+
+        [data-theme="dark"] .status-cair {
+            background: rgba(34, 197, 94, 0.2);
+            color: #4ade80;
+        }
+
+        [data-theme="dark"] .status-belum {
+            background: rgba(234, 179, 8, 0.2);
+            color: #facc15;
+        }
+
+        [data-theme="dark"] .status-mismatch {
+            background: rgba(249, 115, 22, 0.2);
+            color: #fb923c;
+        }
+
+        .period-card {
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .period-card:hover {
+            transform: scale(1.02) translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Section transitions */
+        .section {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .section:not(.hidden) {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Dropdown animation */
+        #overtimeSubmenu {
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        #overtimeSubmenu:not(.hidden) {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        #overtimeArrow {
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Dark mode toggle */
+        .theme-toggle {
+            width: 52px;
+            height: 28px;
+            background: var(--border-color);
+            border-radius: 14px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle::before {
+            content: '';
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            top: 3px;
+            left: 3px;
+            background: white;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        [data-theme="dark"] .theme-toggle {
+            background: var(--accent-primary);
+        }
+
+        [data-theme="dark"] .theme-toggle::before {
+            transform: translateX(24px);
+        }
+
+        /* Chart container responsive */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: auto;
+            min-height: 200px;
+            max-height: 350px;
+        }
+
+        @media (max-width: 640px) {
+            .chart-container {
+                min-height: 180px;
+                max-height: 250px;
+            }
+        }
+
+        /* Labels and text in dark mode */
+        [data-theme="dark"] label,
+        [data-theme="dark"] p,
+        [data-theme="dark"] h1,
+        [data-theme="dark"] h2,
+        [data-theme="dark"] h3,
+        [data-theme="dark"] h4 {
+            color: var(--text-primary);
+        }
+
+        [data-theme="dark"] .text-gray-500,
+        [data-theme="dark"] .text-gray-400,
+        [data-theme="dark"] .text-gray-600 {
+            color: var(--text-secondary) !important;
+        }
+
+        [data-theme="dark"] .text-gray-700,
+        [data-theme="dark"] .text-gray-800 {
+            color: var(--text-primary) !important;
+        }
+
+        [data-theme="dark"] .bg-gray-50,
+        [data-theme="dark"] .bg-white {
+            background: var(--bg-secondary) !important;
+        }
+
+        [data-theme="dark"] .border-gray-200,
+        [data-theme="dark"] .border-gray-100 {
+            border-color: var(--border-color) !important;
+        }
+
+        /* Dark mode: Blue backgrounds */
+        [data-theme="dark"] .bg-blue-50 {
+            background: rgba(59, 130, 246, 0.15) !important;
+        }
+
+        [data-theme="dark"] .bg-blue-100 {
+            background: rgba(59, 130, 246, 0.25) !important;
+        }
+
+        [data-theme="dark"] .text-blue-600,
+        [data-theme="dark"] .text-blue-700,
+        [data-theme="dark"] .text-blue-800 {
+            color: #60a5fa !important;
+        }
+
+        /* Dark mode: Green backgrounds */
+        [data-theme="dark"] .bg-green-50 {
+            background: rgba(34, 197, 94, 0.15) !important;
+        }
+
+        [data-theme="dark"] .bg-green-100 {
+            background: rgba(34, 197, 94, 0.25) !important;
+        }
+
+        [data-theme="dark"] .text-green-600,
+        [data-theme="dark"] .text-green-700 {
+            color: #4ade80 !important;
+        }
+
+        /* Dark mode: Yellow backgrounds */
+        [data-theme="dark"] .bg-yellow-50 {
+            background: rgba(234, 179, 8, 0.15) !important;
+        }
+
+        [data-theme="dark"] .bg-yellow-100 {
+            background: rgba(234, 179, 8, 0.25) !important;
+        }
+
+        [data-theme="dark"] .text-yellow-600,
+        [data-theme="dark"] .text-yellow-700 {
+            color: #facc15 !important;
+        }
+
+        /* Dark mode: Cyan/Teal backgrounds */
+        [data-theme="dark"] .bg-cyan-50,
+        [data-theme="dark"] .bg-teal-50 {
+            background: rgba(6, 182, 212, 0.15) !important;
+        }
+
+        /* Dark mode: Purple backgrounds */
+        [data-theme="dark"] .bg-purple-50 {
+            background: rgba(168, 85, 247, 0.15) !important;
+        }
+
+        [data-theme="dark"] .text-purple-600 {
+            color: #c084fc !important;
+        }
+
+        /* Dark mode: Red backgrounds */
+        [data-theme="dark"] .bg-red-50 {
+            background: rgba(239, 68, 68, 0.15) !important;
+        }
+
+        [data-theme="dark"] .bg-red-100 {
+            background: rgba(239, 68, 68, 0.25) !important;
+        }
+
+        /* Dark mode: Glass cards */
+        [data-theme="dark"] .glass {
+            background: rgba(30, 41, 59, 0.95) !important;
+            border-color: var(--border-color) !important;
+        }
+
+        /* Dark mode: Table styles */
+        [data-theme="dark"] table th,
+        [data-theme="dark"] table td {
+            border-color: var(--border-color);
+        }
+
+        [data-theme="dark"] tbody tr:hover {
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        /* Dark mode: Period card styling */
+        [data-theme="dark"] .period-card {
+            background: var(--bg-secondary);
+            border-color: var(--border-color);
+        }
+
+        [data-theme="dark"] .period-card:hover {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2);
+        }
+
+        /* Dark mode: Form inputs */
+        [data-theme="dark"] input,
+        [data-theme="dark"] select,
+        [data-theme="dark"] textarea {
+            background: var(--bg-primary) !important;
+            border-color: var(--border-color) !important;
+            color: var(--text-primary) !important;
+        }
+
+        [data-theme="dark"] input::placeholder,
+        [data-theme="dark"] textarea::placeholder {
+            color: var(--text-muted) !important;
+        }
+
+        /* Dark mode: Icons in cards */
+        [data-theme="dark"] .fa-chart-line,
+        [data-theme="dark"] .fa-clock,
+        [data-theme="dark"] .fa-calendar-day,
+        [data-theme="dark"] .fa-wallet {
+            color: var(--accent-primary);
+        }
+
+        /* Dark mode: Section headers */
+        [data-theme="dark"] section h2,
+        [data-theme="dark"] section h3 {
+            color: var(--text-primary);
+        }
+
+        /* Dark mode - Card icon backgrounds */
+        [data-theme="dark"] .bg-blue-100,
+        [data-theme="dark"] .bg-green-100,
+        [data-theme="dark"] .bg-cyan-100,
+        [data-theme="dark"] .bg-purple-100 {
+            background: var(--accent-light) !important;
+        }
+
+        /* Dark mode - Text blue colors */
+        [data-theme="dark"] .text-blue-600,
+        [data-theme="dark"] .text-blue-700,
+        [data-theme="dark"] .text-blue-800 {
+            color: var(--accent-primary) !important;
+        }
+
+        /* Dark mode - Background colors */
+        [data-theme="dark"] .bg-blue-50,
+        [data-theme="dark"] .bg-green-50,
+        [data-theme="dark"] .bg-yellow-50 {
+            background: var(--bg-secondary) !important;
+        }
+
+        /* Dark mode - Period card borders */
+        [data-theme="dark"] .border-green-400 {
+            border-color: #22c55e !important;
+        }
+
+        [data-theme="dark"] .border-orange-400 {
+            border-color: #f97316 !important;
+        }
+
+        /* Dark mode - SweetAlert modal */
+        [data-theme="dark"] .swal2-popup {
+            background: var(--bg-secondary) !important;
+            color: var(--text-primary) !important;
+        }
+
+        [data-theme="dark"] .swal2-title {
+            color: var(--text-primary) !important;
+        }
+
+        [data-theme="dark"] .swal2-html-container {
+            color: var(--text-secondary) !important;
+        }
+
+        [data-theme="dark"] .swal2-input {
+            background: var(--bg-primary) !important;
+            color: var(--text-primary) !important;
+            border-color: var(--border-color) !important;
+        }
+
+        /* ===== COMPREHENSIVE DARK MODE OVERRIDES ===== */
+
+        /* Main content area */
+        [data-theme="dark"] main,
+        [data-theme="dark"] .main-content {
+            background: var(--gradient-page) !important;
+        }
+
+        /* All cards and containers */
+        [data-theme="dark"] .card,
+        [data-theme="dark"] .glass,
+        [data-theme="dark"] [class*="bg-white"],
+        [data-theme="dark"] [class*="bg-gray-50"] {
+            background: var(--bg-card) !important;
+            border-color: var(--border-color) !important;
+        }
+
+        /* All text colors */
+        [data-theme="dark"] [class*="text-gray-"] {
+            color: var(--text-secondary) !important;
+        }
+
+        [data-theme="dark"] [class*="text-gray-800"],
+        [data-theme="dark"] [class*="text-gray-900"],
+        [data-theme="dark"] [class*="text-gray-700"] {
+            color: var(--text-primary) !important;
+        }
+
+        /* All borders */
+        [data-theme="dark"] [class*="border-gray-"],
+        [data-theme="dark"] [class*="border-blue-200"] {
+            border-color: var(--border-color) !important;
+        }
+
+        /* Blue themed elements */
+        [data-theme="dark"] [class*="bg-blue-50"],
+        [data-theme="dark"] [class*="bg-blue-100"] {
+            background: rgba(59, 130, 246, 0.15) !important;
+        }
+
+        [data-theme="dark"] [class*="text-blue-"] {
+            color: #60a5fa !important;
+        }
+
+        /* Green themed elements */
+        [data-theme="dark"] [class*="bg-green-50"],
+        [data-theme="dark"] [class*="bg-green-100"] {
+            background: rgba(34, 197, 94, 0.2) !important;
+        }
+
+        [data-theme="dark"] [class*="text-green-"] {
+            color: #4ade80 !important;
+        }
+
+        /* Yellow/Amber themed elements */
+        [data-theme="dark"] [class*="bg-yellow-50"],
+        [data-theme="dark"] [class*="bg-yellow-100"],
+        [data-theme="dark"] [class*="bg-amber-"] {
+            background: rgba(234, 179, 8, 0.2) !important;
+        }
+
+        [data-theme="dark"] [class*="text-yellow-"],
+        [data-theme="dark"] [class*="text-amber-"] {
+            color: #fbbf24 !important;
+        }
+
+        /* Red themed elements */
+        [data-theme="dark"] [class*="bg-red-50"],
+        [data-theme="dark"] [class*="bg-red-100"] {
+            background: rgba(239, 68, 68, 0.2) !important;
+        }
+
+        [data-theme="dark"] [class*="text-red-"] {
+            color: #f87171 !important;
+        }
+
+        /* Cyan themed elements */
+        [data-theme="dark"] [class*="bg-cyan-"],
+        [data-theme="dark"] [class*="bg-teal-"] {
+            background: rgba(6, 182, 212, 0.2) !important;
+        }
+
+        [data-theme="dark"] [class*="text-cyan-"],
+        [data-theme="dark"] [class*="text-teal-"] {
+            color: #22d3ee !important;
+        }
+
+        /* Purple themed elements */
+        [data-theme="dark"] [class*="bg-purple-"] {
+            background: rgba(168, 85, 247, 0.2) !important;
+        }
+
+        [data-theme="dark"] [class*="text-purple-"] {
+            color: #c084fc !important;
+        }
+
+        /* Form elements */
+        [data-theme="dark"] input,
+        [data-theme="dark"] select,
+        [data-theme="dark"] textarea {
+            background: var(--bg-primary) !important;
+            color: var(--text-primary) !important;
+            border-color: var(--border-color) !important;
+        }
+
+        [data-theme="dark"] input::placeholder,
+        [data-theme="dark"] textarea::placeholder,
+        [data-theme="dark"] select option {
+            color: var(--text-muted) !important;
+        }
+
+        /* Tables */
+        [data-theme="dark"] table {
+            color: var(--text-primary);
+        }
+
+        [data-theme="dark"] th {
+            background: var(--bg-primary) !important;
+            color: var(--text-secondary) !important;
+            border-color: var(--border-color) !important;
+        }
+
+        [data-theme="dark"] td {
+            color: var(--text-primary) !important;
+            border-color: var(--border-color) !important;
+        }
+
+        [data-theme="dark"] tbody tr:hover {
+            background: rgba(59, 130, 246, 0.1) !important;
+        }
+
+        /* Status badges */
+        [data-theme="dark"] .status-cair {
+            background: rgba(34, 197, 94, 0.25) !important;
+            color: #4ade80 !important;
+        }
+
+        [data-theme="dark"] .status-belum {
+            background: rgba(234, 179, 8, 0.25) !important;
+            color: #fbbf24 !important;
+        }
+
+        /* Period cards */
+        [data-theme="dark"] .period-card {
+            background: var(--bg-card) !important;
+            border-color: var(--border-color) !important;
+        }
+
+        [data-theme="dark"] .period-card:hover {
+            background: var(--bg-card-hover) !important;
+            border-color: var(--accent-primary) !important;
+        }
+
+        /* Section headers */
+        [data-theme="dark"] h1,
+        [data-theme="dark"] h2,
+        [data-theme="dark"] h3,
+        [data-theme="dark"] h4 {
+            color: var(--text-primary) !important;
+        }
+
+        /* Labels */
+        [data-theme="dark"] label {
+            color: var(--text-secondary) !important;
+        }
+
+        /* Icons */
+        [data-theme="dark"] .fas,
+        [data-theme="dark"] .far,
+        [data-theme="dark"] .fab {
+            color: inherit;
+        }
+
+        /* Code elements */
+        [data-theme="dark"] code {
+            background: rgba(59, 130, 246, 0.15) !important;
+            color: #60a5fa !important;
+        }
+
+        /* Dark mode: Cancel/Secondary buttons */
+        [data-theme="dark"] .bg-gray-100 {
+            background: var(--border-color) !important;
+            color: var(--text-primary) !important;
+        }
+
+        [data-theme="dark"] .bg-gray-100:hover {
+            background: #475569 !important;
+        }
+
+        /* Dark mode: Better table styling */
+        [data-theme="dark"] table {
+            background: var(--bg-card);
+        }
+
+        [data-theme="dark"] thead tr {
+            background: var(--bg-primary) !important;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        [data-theme="dark"] tbody tr {
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        [data-theme="dark"] tbody tr:hover {
+            background: rgba(96, 165, 250, 0.1) !important;
+        }
+
+        /* Gradient cards keep their gradients */
+        [data-theme="dark"] [class*="bg-gradient-to-"] {
+            /* Keep gradient backgrounds */
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                z-index: 50;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0 !important;
+            }
+
+            .mobile-header {
+                display: flex !important;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .mobile-header {
+                display: none !important;
+            }
+        }
+
+        /* Smooth scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--text-muted);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+        }
+
+        /* Button hover animations */
+        button {
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        /* Loading animation */
+        @keyframes pulse-soft {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.6;
+            }
+        }
+
+        .animate-pulse-soft {
+            animation: pulse-soft 2s ease-in-out infinite;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-cyan-50">
+    <!-- Mobile Overlay -->
+    <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 z-40 hidden" onclick="toggleSidebar()"></div>
+
+    <!-- Mobile Header -->
+    <div
+        class="mobile-header fixed top-0 left-0 right-0 bg-white/95 backdrop-blur z-30 p-4 items-center justify-between shadow-sm">
+        <button onclick="toggleSidebar()" class="text-blue-600 text-xl"><i class="fas fa-bars"></i></button>
+        <span class="font-bold text-gray-800">Sistem Karyawan</span>
+        <span id="mobileUser" class="text-sm text-gray-500"></span>
+    </div>
+
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="sidebar w-64 text-white p-6 flex flex-col fixed h-full">
+            <button onclick="toggleSidebar()" class="absolute top-4 right-4 text-white/70 hover:text-white md:hidden"><i
+                    class="fas fa-times"></i></button>
+            <div class="mb-8">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center"><i
+                            class="fas fa-users"></i></div>
+                    <div>
+                        <h1 class="font-bold">Sistem Karyawan</h1>
+                        <p class="text-blue-200 text-xs" id="companyName">Company</p>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="flex-1 space-y-2">
+                <!-- User Menu (hidden for admin) -->
+                <div id="userMenu">
+                    <a href="#" class="nav-link active flex items-center gap-3 px-4 py-3 rounded-xl"
+                        onclick="showSection('dashboard')"><i class="fas fa-home w-5"></i><span>Dashboard</span></a>
+
+                    <!-- Overtime Dropdown -->
+                    <div class="overtime-dropdown">
+                        <button onclick="toggleOvertimeMenu()"
+                            class="nav-link flex items-center justify-between w-full px-4 py-3 rounded-xl">
+                            <span class="flex items-center gap-3"><i
+                                    class="fas fa-clock w-5"></i><span>Overtime</span></span>
+                            <i class="fas fa-chevron-down text-xs transition-transform" id="overtimeArrow"></i>
+                        </button>
+                        <div id="overtimeSubmenu" class="hidden pl-8 space-y-1">
+                            <a href="#" class="nav-link flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm"
+                                onclick="showSection('overtime')"><i class="fas fa-plus w-4"></i><span>Input
+                                    Lembur</span></a>
+                            <a href="#" class="nav-link flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm"
+                                onclick="showSection('rekap')"><i class="fas fa-list w-4"></i><span>Rekap
+                                    Lembur</span></a>
+                        </div>
+                    </div>
+
+                    <a href="#" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl"
+                        onclick="showSection('income')"><i class="fas fa-wallet w-5"></i><span>Pemasukan</span></a>
+                    <a href="#" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl"
+                        onclick="showSection('cashflow')"><i class="fas fa-chart-line w-5"></i><span>Cashflow</span></a>
+                    <a href="#" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl"
+                        onclick="showSection('profile')"><i class="fas fa-user-cog w-5"></i><span>Profil</span></a>
+                </div>
+                <!-- Admin Menu -->
+                <div id="adminMenu" class="hidden">
+                    <div class="border-t border-white/20 my-4"></div>
+                    <a href="#" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl"
+                        onclick="showSection('users')"><i class="fas fa-users-cog w-5"></i><span>Kelola User</span></a>
+                    <a href="#" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl"
+                        onclick="showSection('backup')"><i class="fas fa-database w-5"></i><span>Backup Data</span></a>
+                </div>
+            </nav>
+
+            <div class="pt-4 border-t border-white/20">
+                <!-- Dark Mode Toggle -->
+                <div class="flex items-center justify-between mb-4 px-1">
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-moon text-blue-200"></i>
+                        <span class="text-sm text-blue-100">Mode Gelap</span>
+                    </div>
+                    <div class="theme-toggle" onclick="toggleDarkMode()"></div>
+                </div>
+
+                <div class="flex items-center gap-3 mb-4 cursor-pointer hover:bg-white/10 rounded-xl p-2 -mx-2 transition-colors"
+                    onclick="showSection('profile')">
+                    <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center"><i
+                            class="fas fa-user"></i></div>
+                    <div>
+                        <p class="font-medium text-sm" id="userName">User</p>
+                        <p class="text-blue-200 text-xs" id="userRole">Role</p>
+                    </div>
+                </div>
+                <button onclick="logout()"
+                    class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20"><i
+                        class="fas fa-sign-out-alt"></i><span>Logout</span></button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content flex-1 ml-64 p-4 md:p-8 pt-20 md:pt-8">
+
+            <!-- Dashboard -->
+            <section id="section-dashboard" class="section">
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">Dashboard</h2>
+                <div class="flex flex-col md:flex-row md:items-center gap-2 mb-6 text-gray-500">
+                    <span>Periode:</span>
+                    <select id="periodSelector" onchange="changePeriod()"
+                        class="bg-white border border-gray-200 rounded-lg px-3 py-1 text-sm focus:outline-none focus:border-blue-500"></select>
+                    <span class="text-xs text-blue-500 ml-2" id="periodRange"></span>
+                </div>
+
+                <div class="glass rounded-2xl p-6 mb-6">
+                    <h3 class="font-semibold text-gray-800 mb-4">Grafik Lembur Periode Ini</h3>
+                    <div class="chart-container">
+                        <canvas id="dashboardChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-6 md:mb-8">
+                    <div class="card glass rounded-xl sm:rounded-2xl p-4 sm:p-6">
+                        <div class="flex items-center gap-3 sm:gap-4">
+                            <div
+                                class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-clock text-blue-600 text-lg sm:text-xl"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-gray-500 text-xs sm:text-sm">Lembur Minggu Ini</p>
+                                <p class="text-lg sm:text-xl font-bold text-gray-800 truncate" id="statWeekOT">Rp 0</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card glass rounded-xl sm:rounded-2xl p-4 sm:p-6">
+                        <div class="flex items-center gap-3 sm:gap-4">
+                            <div
+                                class="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-wallet text-green-600 text-lg sm:text-xl"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-gray-500 text-xs sm:text-sm">Pemasukan Bulan Ini</p>
+                                <p class="text-lg sm:text-xl font-bold text-gray-800 truncate" id="statMonthIncome">Rp 0
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card glass rounded-xl sm:rounded-2xl p-4 sm:p-6">
+                        <div class="flex items-center gap-3 sm:gap-4">
+                            <div
+                                class="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-coins text-purple-600 text-lg sm:text-xl"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-gray-500 text-xs sm:text-sm">Lembur Cair Bulan Ini</p>
+                                <p class="text-lg sm:text-xl font-bold text-gray-800 truncate" id="statMonthOT">Rp 0</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card glass rounded-xl sm:rounded-2xl p-4 sm:p-6">
+                        <div class="flex items-center gap-3 sm:gap-4">
+                            <div
+                                class="w-10 h-10 sm:w-12 sm:h-12 bg-cyan-100 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-calendar text-cyan-600 text-lg sm:text-xl"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-gray-500 text-xs sm:text-sm">Tanggal Bayar</p>
+                                <p class="text-base sm:text-lg font-bold text-gray-800 truncate" id="statPayDate">-</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass rounded-2xl p-6">
+                    <h3 class="font-semibold text-gray-800 mb-4">Data Lembur Minggu Ini</h3>
+                    <div id="weeklyOTList" class="space-y-3"></div>
+                </div>
+            </section>
+
+            <!-- Overtime Input -->
+            <section id="section-overtime" class="section hidden">
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">Input Lembur</h2>
+                <div class="flex flex-col md:flex-row md:items-center gap-2 mb-6 text-gray-500">
+                    <span>Periode Saat Ini:</span>
+                    <select id="inputPeriodSelector" onchange="changeInputPeriod()"
+                        class="bg-white border border-gray-200 rounded-lg px-3 py-1 text-sm focus:outline-none focus:border-blue-500"></select>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="glass rounded-2xl p-6">
+                        <h3 class="font-semibold text-gray-800 mb-4">Tambah Data Lembur</h3>
+                        <!-- Salary Warning (shown when salary = 0) -->
+                        <div id="salaryWarning"
+                            class="hidden mb-4 p-4 rounded-xl bg-yellow-50 border border-yellow-300">
+                            <div class="flex items-start gap-3">
+                                <i class="fas fa-exclamation-triangle text-yellow-600 mt-0.5"></i>
+                                <div>
+                                    <p class="font-medium text-yellow-800">Gaji Pokok Belum Diatur</p>
+                                    <p class="text-sm text-yellow-700 mt-1">Estimasi lembur akan 0 jika gaji belum
+                                        diatur.</p>
+                                    <p class="text-sm text-yellow-700 mt-1">💡 <strong>Tips:</strong> Cek gaji kotor
+                                        Anda di aplikasi <strong>JMO</strong> untuk mengetahui nominal yang benar.</p>
+                                    <a href="#" onclick="showSection('profile')"
+                                        class="text-sm text-blue-600 hover:underline mt-2 inline-block">→ Atur Gaji di
+                                        Profil</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal</label>
+                                <input type="date" id="otDate"
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white">
+                                <p class="text-sm text-gray-500 mt-1" id="otDayName"></p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Status Kehadiran / Jam
+                                    Lembur</label>
+                                <select id="otHours"
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white">
+                                    <!-- Populated dynamically based on day -->
+                                </select>
+                            </div>
+                            <div id="holidayHoursWrapper" class="hidden">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Jam Kerja (Libur
+                                    Masuk)</label>
+                                <input type="number" id="otHolidayHours"
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white"
+                                    placeholder="Contoh: 8" min="1" max="12">
+                            </div>
+                            <div class="glass rounded-xl p-4 border-l-4 border-blue-500">
+                                <p class="text-sm text-gray-500">Estimasi Pendapatan:</p>
+                                <p class="text-2xl font-bold text-blue-600" id="otPreview">Rp 0</p>
+                            </div>
+                            <button onclick="saveOT()"
+                                class="btn-primary w-full py-3 rounded-xl text-white font-medium"><i
+                                    class="fas fa-plus mr-2"></i>Simpan Lembur</button>
+                        </div>
+                    </div>
+
+                    <div class="glass rounded-2xl p-6">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-2">
+                            <h3 class="font-semibold text-gray-800">Data Periode Ini</h3>
+                            <span class="text-sm text-blue-600 font-medium" id="periodRange"></span>
+                        </div>
+                        <div id="periodOTList" class="space-y-3 mb-4 max-h-64 overflow-y-auto"></div>
+                        <div class="glass rounded-xl p-4 border-l-4 border-cyan-500 text-center">
+                            <p class="text-gray-500 text-sm">Total Periode</p>
+                            <p class="text-2xl font-bold text-cyan-600" id="periodTotal">Rp 0</p>
+                            <p class="text-gray-400 text-sm" id="periodPayDate">Bayar: -</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Rekap Lembur -->
+            <section id="section-rekap" class="section hidden">
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">Rekap Lembur</h2>
+                <p class="text-gray-500 mb-6">Kelola status pencairan lembur per periode</p>
+
+                <!-- Summary Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="glass rounded-xl p-4 text-center border-l-4 border-blue-500">
+                        <p class="text-gray-500 text-sm">Total Periode</p>
+                        <p class="text-2xl font-bold text-blue-600" id="rekapTotalPeriods">0</p>
+                    </div>
+                    <div class="glass rounded-xl p-4 text-center border-l-4 border-green-500">
+                        <p class="text-gray-500 text-sm">Sudah Cair</p>
+                        <p class="text-2xl font-bold text-green-600" id="rekapTotalCair">0</p>
+                    </div>
+                    <div class="glass rounded-xl p-4 text-center border-l-4 border-yellow-500">
+                        <p class="text-gray-500 text-sm">Belum Cair</p>
+                        <p class="text-2xl font-bold text-yellow-600" id="rekapTotalBelum">0</p>
+                    </div>
+                </div>
+
+                <!-- Total Amount Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div class="glass rounded-2xl p-5 border-l-4 border-green-500">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-check-circle text-green-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-gray-500 text-sm">Total Sudah Cair</p>
+                                <p class="text-2xl font-bold text-green-600" id="rekapAmountCair">Rp 0</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="glass rounded-2xl p-5 border-l-4 border-yellow-500">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-clock text-yellow-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-gray-500 text-sm">Total Belum Cair</p>
+                                <p class="text-2xl font-bold text-yellow-600" id="rekapAmountBelum">Rp 0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interactive Filter -->
+                <div class="glass rounded-2xl p-6 mb-6">
+                    <div class="flex flex-wrap gap-4 items-center">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-filter text-gray-400"></i>
+                            <span class="text-gray-600 font-medium">Filter:</span>
+                        </div>
+                        <select id="rekapMonth" onchange="loadRekap()"
+                            class="px-4 py-2.5 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-blue-500 cursor-pointer transition-all hover:border-blue-300"></select>
+                        <select id="rekapYear" onchange="loadRekap()"
+                            class="px-4 py-2.5 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-blue-500 cursor-pointer transition-all hover:border-blue-300"></select>
+                    </div>
+                    <p class="text-gray-400 text-sm mt-3"><i class="fas fa-info-circle mr-1"></i> Klik periode untuk
+                        melihat detail dan mengubah status</p>
+                </div>
+
+                <!-- Interactive Chart -->
+                <div class="glass rounded-2xl p-6 mb-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-semibold text-gray-800"><i
+                                class="fas fa-chart-bar text-blue-500 mr-2"></i>Grafik Lembur Harian</h3>
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm text-gray-500" id="chartPeriodLabel">-</span>
+                        </div>
+                    </div>
+                    <div class="relative h-64">
+                        <canvas id="overtimeChart"></canvas>
+                    </div>
+                    <div class="flex justify-center gap-6 mt-4 text-sm">
+                        <div class="flex items-center gap-2">
+                            <div class="w-3 h-3 rounded-full bg-blue-500"></div>
+                            <span class="text-gray-600">Jumlah (Rp)</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div class="w-3 h-3 rounded-full bg-cyan-400"></div>
+                            <span class="text-gray-600">Jam Lembur</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Periods Grid -->
+                <div id="rekapPeriods" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5"></div>
+
+                <!-- Loading State -->
+                <div id="rekapLoading" class="hidden text-center py-12">
+                    <i class="fas fa-spinner fa-spin text-4xl text-blue-500 mb-4"></i>
+                    <p class="text-gray-500">Memuat data...</p>
+                </div>
+            </section>
+
+
+            <!-- Income -->
+            <section id="section-income" class="section hidden">
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">Tambah Pemasukan</h2>
+                <p class="text-gray-500 mb-6">Catat gaji, bonus, atau pemasukan lainnya</p>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="glass rounded-2xl p-6">
+                        <h3 class="font-semibold text-gray-800 mb-4">Input Pemasukan</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal</label>
+                                <input type="date" id="incomeDate"
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Jenis</label>
+                                <select id="incomeType"
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white">
+                                    <option value="gaji">💵 Gaji</option>
+                                    <option value="bonus">🎁 Bonus</option>
+                                    <option value="lainnya">📦 Lainnya</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Jumlah</label>
+                                <input type="number" id="incomeAmount"
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white"
+                                    placeholder="5000000">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Catatan</label>
+                                <input type="text" id="incomeNote"
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white"
+                                    placeholder="Opsional">
+                            </div>
+                            <button onclick="saveIncome()"
+                                class="btn-primary w-full py-3 rounded-xl text-white font-medium"><i
+                                    class="fas fa-plus mr-2"></i>Tambah</button>
+                        </div>
+                    </div>
+                    <div class="glass rounded-2xl p-6">
+                        <h3 class="font-semibold text-gray-800 mb-4">Riwayat</h3>
+                        <div id="incomeList" class="space-y-3 max-h-96 overflow-y-auto"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Cashflow -->
+            <section id="section-cashflow" class="section hidden">
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">Cashflow</h2>
+                <p class="text-gray-500 mb-6">Ringkasan keuangan (hanya lembur yang sudah cair)</p>
+
+                <div class="glass rounded-2xl p-6 mb-6">
+                    <div class="flex flex-wrap gap-4 mb-6">
+                        <select id="cfMonth" class="px-4 py-2 rounded-xl border border-gray-200 bg-white"></select>
+                        <select id="cfYear" class="px-4 py-2 rounded-xl border border-gray-200 bg-white"></select>
+                        <button onclick="loadCashflow()"
+                            class="btn-primary px-6 py-2 rounded-xl text-white">Filter</button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-green-50 rounded-xl p-4 text-center">
+                            <p class="text-green-600 text-sm">Pemasukan</p>
+                            <p class="text-2xl font-bold text-green-700" id="cfIncome">Rp 0</p>
+                        </div>
+                        <div class="bg-blue-50 rounded-xl p-4 text-center">
+                            <p class="text-blue-600 text-sm">Lembur Cair</p>
+                            <p class="text-2xl font-bold text-blue-700" id="cfOvertime">Rp 0</p>
+                        </div>
+                        <div class="bg-purple-50 rounded-xl p-4 text-center">
+                            <p class="text-purple-600 text-sm">Total</p>
+                            <p class="text-2xl font-bold text-purple-700" id="cfTotal">Rp 0</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="glass rounded-2xl p-6">
+                        <h3 class="font-semibold text-gray-800 mb-4">Pemasukan</h3>
+                        <div id="cfIncomeList" class="space-y-2 max-h-80 overflow-y-auto"></div>
+                    </div>
+                    <div class="glass rounded-2xl p-6">
+                        <h3 class="font-semibold text-gray-800 mb-4">Lembur Cair</h3>
+                        <div id="cfOvertimeList" class="space-y-2 max-h-80 overflow-y-auto"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Profile -->
+            <section id="section-profile" class="section hidden">
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">Profil Saya</h2>
+                <p class="text-gray-500 mb-6">Edit data Anda</p>
+                <div class="glass rounded-2xl p-6 max-w-lg">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Nama</label>
+                            <input type="text" id="profileName"
+                                class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Gaji Pokok</label>
+                            <input type="number" id="profileSalary"
+                                class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Uang Makan</label>
+                            <input type="number" id="profileMeal"
+                                class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white">
+                        </div>
+
+                        <button onclick="saveProfile()"
+                            class="btn-primary w-full py-3 rounded-xl text-white font-medium"><i
+                                class="fas fa-save mr-2"></i>Simpan</button>
+                    </div>
+                </div>
+
+                <!-- Password Change -->
+                <div class="glass rounded-2xl p-6">
+                    <h3 class="font-semibold text-gray-800 mb-4"><i class="fas fa-key mr-2 text-yellow-500"></i>Ubah
+                        Password</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Password Lama</label>
+                            <input type="password" id="currentPassword"
+                                class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white"
+                                placeholder="Masukkan password lama">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Password Baru</label>
+                            <input type="password" id="newPassword"
+                                class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white"
+                                placeholder="Masukkan password baru">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Konfirmasi Password Baru</label>
+                            <input type="password" id="confirmPassword"
+                                class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white"
+                                placeholder="Ulangi password baru">
+                        </div>
+                        <button onclick="changePassword()"
+                            class="w-full py-3 rounded-xl bg-yellow-500 hover:bg-yellow-600 text-white font-medium transition-colors"><i
+                                class="fas fa-lock mr-2"></i>Ubah Password</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Users (Admin) -->
+            <section id="section-users" class="section hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-800">Kelola User</h2>
+                        <p class="text-gray-500">Buat user dan set Telegram ID</p>
+                    </div>
+                    <button onclick="openUserModal()" class="btn-primary px-6 py-3 rounded-xl text-white font-medium"><i
+                            class="fas fa-plus mr-2"></i>Tambah User</button>
+                </div>
+                <div class="glass rounded-2xl p-6">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="text-left text-gray-500 text-sm border-b">
+                                <th class="pb-3">Nama</th>
+                                <th class="pb-3">Username</th>
+                                <th class="pb-3">Telegram ID</th>
+                                <th class="pb-3">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTable"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Scheduled Jobs REMOVED -->
+            <section id="section-scheduled" class="section hidden" style="display:none">
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-800">Jadwal Pesan</h2>
+                        <p class="text-gray-500">Kelola broadcast otomatis terjadwal</p>
+                    </div>
+                    <button onclick="openScheduledJobModal()"
+                        class="btn-primary px-6 py-3 rounded-xl text-white font-medium w-full sm:w-auto"><i
+                            class="fas fa-plus mr-2"></i>Tambah Jadwal</button>
+                </div>
+
+                <!-- Variable Info Card -->
+                <div class="card rounded-2xl p-5 mb-6 border border-blue-200 dark:border-blue-800">
+                    <h4 class="font-semibold text-blue-700 dark:text-blue-400 mb-3">
+                        <i class="fas fa-code mr-2"></i>Variabel yang Tersedia
+                    </h4>
+                    <!-- User Info -->
+                    <p class="text-xs text-gray-500 mb-2 uppercase font-semibold">Info User</p>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 mb-4">
+                        <div class="flex items-center gap-1 px-2 py-1.5 rounded bg-blue-50 dark:bg-blue-900/30">
+                            <code class="text-blue-600 dark:text-blue-400 font-mono text-xs">[nama]</code>
+                            <span class="text-gray-500 text-xs">Nama</span>
+                        </div>
+                        <div class="flex items-center gap-1 px-2 py-1.5 rounded bg-blue-50 dark:bg-blue-900/30">
+                            <code class="text-blue-600 dark:text-blue-400 font-mono text-xs">[username]</code>
+                            <span class="text-gray-500 text-xs">Username</span>
+                        </div>
+                        <div class="flex items-center gap-1 px-2 py-1.5 rounded bg-blue-50 dark:bg-blue-900/30">
+                            <code class="text-blue-600 dark:text-blue-400 font-mono text-xs">[gaji]</code>
+                            <span class="text-gray-500 text-xs">Gaji</span>
+                        </div>
+                        <div class="flex items-center gap-1 px-2 py-1.5 rounded bg-blue-50 dark:bg-blue-900/30">
+                            <code class="text-blue-600 dark:text-blue-400 font-mono text-xs">[uang_makan]</code>
+                            <span class="text-gray-500 text-xs">Uang makan</span>
+                        </div>
+                    </div>
+                    <!-- Waktu -->
+                    <p class="text-xs text-gray-500 mb-2 uppercase font-semibold">Waktu</p>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 mb-4">
+                        <div class="flex items-center gap-1 px-2 py-1.5 rounded bg-cyan-50 dark:bg-cyan-900/30">
+                            <code class="text-cyan-600 dark:text-cyan-400 font-mono text-xs">[tanggal]</code>
+                            <span class="text-gray-500 text-xs">Tanggal</span>
+                        </div>
+                        <div class="flex items-center gap-1 px-2 py-1.5 rounded bg-cyan-50 dark:bg-cyan-900/30">
+                            <code class="text-cyan-600 dark:text-cyan-400 font-mono text-xs">[hari]</code>
+                            <span class="text-gray-500 text-xs">Hari</span>
+                        </div>
+                        <div class="flex items-center gap-1 px-2 py-1.5 rounded bg-cyan-50 dark:bg-cyan-900/30">
+                            <code class="text-cyan-600 dark:text-cyan-400 font-mono text-xs">[bulan]</code>
+                            <span class="text-gray-500 text-xs">Bulan</span>
+                        </div>
+                        <div class="flex items-center gap-1 px-2 py-1.5 rounded bg-cyan-50 dark:bg-cyan-900/30">
+                            <code class="text-cyan-600 dark:text-cyan-400 font-mono text-xs">[tahun]</code>
+                            <span class="text-gray-500 text-xs">Tahun</span>
+                        </div>
+                        <div class="flex items-center gap-1 px-2 py-1.5 rounded bg-cyan-50 dark:bg-cyan-900/30">
+                            <code class="text-cyan-600 dark:text-cyan-400 font-mono text-xs">[jam]</code>
+                            <span class="text-gray-500 text-xs">Jam</span>
+                        </div>
+                    </div>
+                    <!-- Overtime -->
+                    <p class="text-xs text-gray-500 mb-2 uppercase font-semibold">Overtime</p>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+                        <div class="flex items-center gap-1 px-2 py-1.5 rounded bg-green-50 dark:bg-green-900/30">
+                            <code class="text-green-600 dark:text-green-400 font-mono text-xs">[total_ot]</code>
+                            <span class="text-gray-500 text-xs">Total OT</span>
+                        </div>
+                        <div class="flex items-center gap-1 px-2 py-1.5 rounded bg-green-50 dark:bg-green-900/30">
+                            <code class="text-green-600 dark:text-green-400 font-mono text-xs">[periode]</code>
+                            <span class="text-gray-500 text-xs">Periode</span>
+                        </div>
+                        <div class="flex items-center gap-1 px-2 py-1.5 rounded bg-green-50 dark:bg-green-900/30">
+                            <code class="text-green-600 dark:text-green-400 font-mono text-xs">[tanggal_bayar]</code>
+                            <span class="text-gray-500 text-xs">Tgl Bayar</span>
+                        </div>
+                        <div class="flex items-center gap-1 px-2 py-1.5 rounded bg-green-50 dark:bg-green-900/30">
+                            <code
+                                class="text-green-600 dark:text-green-400 font-mono text-xs">[total_hari_lembur]</code>
+                            <span class="text-gray-500 text-xs">Hari Lembur</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Jobs List -->
+                <div class="glass rounded-2xl p-6">
+                    <div id="scheduledJobsList" class="space-y-4">
+                        <p class="text-gray-400 text-center py-4">Memuat data...</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Backup Section (Admin) -->
+            <section id="section-backup" class="section hidden">
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">Backup Data</h2>
+                <p class="text-gray-500 mb-6">Download backup manual</p>
+
+                <div class="glass rounded-2xl p-6 max-w-lg">
+                    <h3 class="font-semibold text-gray-800 mb-4"><i
+                            class="fas fa-database mr-2 text-blue-500"></i>Backup Manual</h3>
+                    <p class="text-gray-500 text-sm mb-4">Download backup semua data (users, overtime, income) sebagai file JSON.</p>
+                    <div class="space-y-4">
+                        <button onclick="downloadBackup()"
+                            class="btn-primary w-full py-3 rounded-xl text-white font-medium">
+                            <i class="fas fa-download mr-2"></i>Download Backup
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- WA Bot REMOVED -->
+            <section id="section-wabot" class="section hidden" style="display:none">
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">Pengaturan WA Bot</h2>
+                <p class="text-gray-500 mb-6">Konfigurasi WhatsApp Bot untuk sistem keuangan & lembur</p>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Bot Config -->
+                    <div class="glass rounded-2xl p-6">
+                        <h3 class="font-semibold text-gray-800 mb-4"><i
+                                class="fas fa-cog text-blue-500 mr-2"></i>Konfigurasi Bot</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Prefix Command</label>
+                                <input type="text" id="wabotPrefix" maxlength="1"
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white" placeholder="!">
+                                <p class="text-xs text-gray-400 mt-1">Karakter prefix untuk command bot (misal: !, #, /)
+                                </p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Nama Bot</label>
+                                <input type="text" id="wabotName"
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white"
+                                    placeholder="Bot Lembur">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Gemini API Key</label>
+                                <input type="password" id="wabotGeminiKey"
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white"
+                                    placeholder="AIza...">
+                                <p class="text-xs text-gray-400 mt-1">Dapatkan dari <a
+                                        href="https://aistudio.google.com/" target="_blank"
+                                        class="text-blue-500 hover:underline">Google AI Studio</a></p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Super Admin (Nomor
+                                    WA)</label>
+                                <input type="text" id="wabotSuperAdmin"
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white"
+                                    placeholder="08123456789">
+                                <p class="text-xs text-gray-400 mt-1">Nomor dengan akses penuh ke semua fitur bot</p>
+                            </div>
+                            <button onclick="saveWaBotConfig()"
+                                class="btn-primary w-full py-3 rounded-xl text-white font-medium">
+                                <i class="fas fa-save mr-2"></i>Simpan Konfigurasi
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Admin List -->
+                    <div class="glass rounded-2xl p-6">
+                        <h3 class="font-semibold text-gray-800 mb-4"><i
+                                class="fas fa-user-shield text-green-500 mr-2"></i>Daftar Admin Bot</h3>
+                        <p class="text-sm text-gray-500 mb-4">Admin dapat menggunakan command keuangan di bot</p>
+
+                        <div class="flex gap-2 mb-4">
+                            <input type="text" id="wabotNewAdmin"
+                                class="flex-1 px-4 py-3 rounded-xl border border-gray-200 bg-white"
+                                placeholder="08123456789">
+                            <button onclick="addWaBotAdmin()" class="btn-primary px-4 py-3 rounded-xl text-white">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+
+                        <div id="wabotAdminList" class="space-y-2 max-h-64 overflow-y-auto">
+                            <!-- Admin list items will be inserted here -->
+                        </div>
+
+                        <div id="wabotAdminEmpty" class="text-center py-8 text-gray-400 hidden">
+                            <i class="fas fa-users text-3xl mb-2"></i>
+                            <p>Belum ada admin</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bot Status -->
+                <div class="glass rounded-2xl p-6 mt-6">
+                    <h3 class="font-semibold text-gray-800 mb-4"><i
+                            class="fas fa-info-circle text-cyan-500 mr-2"></i>Status & Info</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-blue-50 rounded-xl p-4 text-center">
+                            <p class="text-gray-500 text-sm">Prefix</p>
+                            <p class="text-2xl font-bold text-blue-600" id="wabotStatusPrefix">!</p>
+                        </div>
+                        <div class="bg-green-50 rounded-xl p-4 text-center">
+                            <p class="text-gray-500 text-sm">Gemini API</p>
+                            <p class="text-lg font-bold" id="wabotStatusGemini">-</p>
+                        </div>
+                        <div class="bg-purple-50 rounded-xl p-4 text-center">
+                            <p class="text-gray-500 text-sm">Total Admin</p>
+                            <p class="text-2xl font-bold text-purple-600" id="wabotStatusAdmins">0</p>
+                        </div>
+                    </div>
+                    <div class="mt-4 p-4 bg-yellow-50 rounded-xl">
+                        <p class="text-sm text-yellow-700"><i class="fas fa-lightbulb mr-2"></i><strong>Tips:</strong>
+                            User yang sudah mengisi "Telegram ID" di profil overtime dengan nomor WA mereka akan
+                            otomatis bisa menggunakan command keuangan (<code>!cashflow</code>, <code>!lembur</code>,
+                            <code>!profil</code>).
+                        </p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Edit OT Modal -->
+    <div id="editOTModal"
+        class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center">
+        <div class="glass rounded-2xl p-6 w-full max-w-md mx-4">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Edit Lembur</h3>
+            <div class="space-y-4">
+                <input type="hidden" id="editOTId">
+                <div><label class="block text-sm font-medium text-gray-700 mb-2">Tanggal</label>
+                    <p class="font-medium" id="editOTDate"></p>
+                </div>
+                <div><label class="block text-sm font-medium text-gray-700 mb-2">Jam</label><input type="number"
+                        id="editOTHours" class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white" step="0.5"
+                        min="0"></div>
+                <div><label class="flex items-center gap-2"><input type="checkbox" id="editOTHoliday"
+                            class="w-4 h-4"><span class="text-sm text-gray-700">Libur Masuk (rate 2x)</span></label>
+                </div>
+                <div><label class="block text-sm font-medium text-gray-700 mb-2">Status</label><select id="editOTStatus"
+                        class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white">
+                        <option value="belum">Belum Cair</option>
+                        <option value="cair">Sudah Cair ✅</option>
+                    </select></div>
+                <div class="flex gap-3"><button onclick="closeEditOT()"
+                        class="flex-1 px-4 py-2 rounded-lg bg-gray-100 text-gray-700">Batal</button><button
+                        onclick="updateOT()" class="flex-1 btn-primary px-4 py-2 rounded-lg text-white">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Modal -->
+    <div id="userModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center">
+        <div class="glass rounded-2xl p-6 w-full max-w-md mx-4">
+            <h3 class="text-xl font-bold text-gray-800 mb-4" id="userModalTitle">Tambah User</h3>
+            <form id="userForm" class="space-y-4">
+                <input type="hidden" id="editUserId">
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="block text-sm font-medium text-gray-700 mb-1">Username</label><input type="text"
+                            id="formUsername" required
+                            class="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white"></div>
+                    <div id="passwordFieldWrapper"><label
+                            class="block text-sm font-medium text-gray-700 mb-1">Password</label><input type="text"
+                            id="formPassword" class="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white"
+                            placeholder="Default: 123"></div>
+                </div>
+                <div><label class="block text-sm font-medium text-gray-700 mb-1">Nama</label><input type="text"
+                        id="formName" required class="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white">
+                </div>
+                <div><label class="block text-sm font-medium text-gray-700 mb-1">Telegram ID</label><input type="text"
+                        id="formTelegramId" class="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white"
+                        placeholder="Dari /start di bot"></div>
+                <div class="flex gap-3"><button type="button" onclick="closeUserModal()"
+                        class="flex-1 px-4 py-2 rounded-lg bg-gray-100 text-gray-700">Batal</button><button
+                        type="submit" class="flex-1 btn-primary px-4 py-2 rounded-lg text-white">Simpan</button></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scheduled Job Modal -->
+    <div id="scheduledJobModal"
+        class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center">
+        <div class="glass rounded-2xl p-6 w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
+            <h3 class="text-xl font-bold text-gray-800 mb-4" id="jobModalTitle">Tambah Jadwal Pesan</h3>
+            <form id="jobForm" class="space-y-4">
+                <input type="hidden" id="editJobId">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Nama Job</label>
+                    <input type="text" id="jobName" required
+                        class="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white"
+                        placeholder="Contoh: Reminder Gaji">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Pesan <span
+                            class="text-gray-400">(support variabel)</span></label>
+                    <textarea id="jobMessage" required
+                        class="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white h-24"
+                        placeholder="Contoh: Halo [nama], gaji [gaji] sudah cair!"></textarea>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Tipe Jadwal</label>
+                        <select id="jobScheduleType" class="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white"
+                            onchange="updateScheduleFields()">
+                            <option value="monthly_date">Tiap Tanggal (Bulanan)</option>
+                            <option value="weekly_day">Tiap Hari (Mingguan)</option>
+                            <option value="daily_time">Tiap Hari (Harian)</option>
+                            <option value="once">Sekali Saja</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Jam</label>
+                        <input type="time" id="jobTime"
+                            class="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white" value="08:00">
+                    </div>
+                </div>
+                <div id="scheduleParamWrapper">
+                    <div id="monthlyParam">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal</label>
+                        <input type="number" id="jobDay"
+                            class="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white" min="1" max="31"
+                            value="25" placeholder="1-31">
+                    </div>
+                    <div id="weeklyParam" class="hidden">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Hari</label>
+                        <select id="jobWeekDay" class="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white">
+                            <option value="Senin">Senin</option>
+                            <option value="Selasa">Selasa</option>
+                            <option value="Rabu">Rabu</option>
+                            <option value="Kamis">Kamis</option>
+                            <option value="Jumat">Jumat</option>
+                            <option value="Sabtu">Sabtu</option>
+                            <option value="Minggu">Minggu</option>
+                        </select>
+                    </div>
+                    <div id="onceParam" class="hidden">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal</label>
+                        <input type="date" id="jobOnceDate"
+                            class="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Target User</label>
+                    <div class="border border-gray-200 rounded-lg p-3 max-h-40 overflow-y-auto bg-white">
+                        <label class="flex items-center gap-2 mb-2 pb-2 border-b border-gray-100">
+                            <input type="checkbox" id="jobTargetAll" class="w-4 h-4"
+                                onchange="toggleAllTargetUsers(this.checked)">
+                            <span class="font-medium text-gray-800">Semua User</span>
+                        </label>
+                        <div id="jobTargetUsersList" class="space-y-1">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+                <div class="flex gap-3">
+                    <button type="button" onclick="closeScheduledJobModal()"
+                        class="flex-1 px-4 py-2 rounded-lg bg-gray-100 text-gray-700">Batal</button>
+                    <button type="submit" class="flex-1 btn-primary px-4 py-2 rounded-lg text-white">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let currentPeriod = null;
+        const formatRp = n => 'Rp ' + (n || 0).toLocaleString('id-ID');
+        const weekdayRateMap = { 1: 1.5, 1.5: 2.5, 2: 3.5, 2.5: 4.5, 3: 5.5 };
+        const dayNames = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+        const monthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('hidden');
+        }
+
+        function toggleOvertimeMenu() {
+            const submenu = document.getElementById('overtimeSubmenu');
+            const arrow = document.getElementById('overtimeArrow');
+            submenu.classList.toggle('hidden');
+            arrow.classList.toggle('rotate-180');
+        }
+
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const isDark = html.getAttribute('data-theme') === 'dark';
+            if (isDark) {
+                html.removeAttribute('data-theme');
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // Apply saved theme on load
+        (function () {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
+
+        function showSection(section) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
+            // Show the selected section
+            const targetSection = document.getElementById('section-' + section);
+            if (targetSection) targetSection.classList.remove('hidden');
+            // Update nav links
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            event?.target?.closest?.('.nav-link')?.classList?.add?.('active');
+            // Close sidebar on mobile
+            if (window.innerWidth < 769) {
+                document.getElementById('sidebar').classList.remove('open');
+                document.getElementById('sidebarOverlay').classList.add('hidden');
+            }
+            // Load section data
+            if (section === 'users') loadUsers();
+            if (section === 'rekap') loadRekap();
+            if (section === 'income') loadIncomeList();
+            if (section === 'cashflow') loadCashflow();
+            if (section === 'scheduled') loadScheduledJobs();
+            if (section === 'backup') loadBackupStatus();
+            if (section === 'wabot') loadWABotStatus();
+        }
+
+        function formatDateID(dateStr) {
+            const d = new Date(dateStr);
+            return `${d.getDate()} ${monthNames[d.getMonth()]} ${d.getFullYear()}`;
+        }
+
+        function getWeekPeriod(dateStr) {
+            const date = new Date(dateStr);
+            const day = date.getDay();
+            let daysToThursday = day >= 4 ? day - 4 : day + 3;
+            const thursday = new Date(date);
+            thursday.setDate(date.getDate() - daysToThursday);
+            const wednesday = new Date(thursday);
+            wednesday.setDate(thursday.getDate() + 6);
+            return { start: thursday.toISOString().split('T')[0], end: wednesday.toISOString().split('T')[0] };
+        }
+
+        // Calculate time range for overtime display (e.g., "17:00 - 19:00 (1.5 jam)")
+        // Weekdays have a 30min break from 18:00-18:30, so add that to end time
+        function getTimeRange(dayName, hours, isHoliday = false) {
+            if (hours === -1) return 'Tidak Masuk';
+            if (hours === 0 && !isHoliday) return 'Masuk (Tanpa Lembur)';
+            if (hours === 0 && isHoliday) return 'Libur (Tidak Kerja)';
+
+            const isFriday = dayName === 'Jumat';
+            const isWeekend = ['Sabtu', 'Minggu'].includes(dayName);
+
+            // Weekend or holiday: custom hours
+            if (isWeekend || isHoliday) {
+                return `${hours} jam (Libur)`;
+            }
+
+            // Weekday overtime calculation
+            // Normal end time: 17:00 (Mon-Thu) or 16:45 (Fri)
+            const baseEndHour = isFriday ? 16 : 17;
+            const baseEndMin = isFriday ? 45 : 0;
+
+            // End time based on hours + 30min break (18:00-18:30 on weekdays)
+            const totalMins = hours * 60;
+            let endTotalMins = baseEndHour * 60 + baseEndMin + totalMins;
+
+            // If end time is past 18:00 (1080 mins), add 30 min break
+            if (endTotalMins > 18 * 60) {
+                endTotalMins += 30;
+            }
+
+            const endHour = Math.floor(endTotalMins / 60);
+            const endMin = endTotalMins % 60;
+
+            const formatTime = (h, m) => `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+            return `${formatTime(baseEndHour, baseEndMin)} - ${formatTime(endHour, endMin)} (${hours} jam)`;
+        }
+
+        function calcOTAmount(salary, meal, dayName, hours, isHoliday) {
+            // hours = -1: Tidak Masuk / Cuti / Tanggal Merah -> 0 income
+            if (hours === -1) return 0;
+            const isWeekend = ['Sabtu', 'Minggu'].includes(dayName);
+            // hours = 0: Present but no overtime
+            if (hours === 0) {
+                // Weekend/holiday: no work expected, 0 hours = 0 income
+                if (isWeekend || isHoliday) return 0;
+                // Weekday: present but no overtime = meal allowance only
+                return meal;
+            }
+            const hourlyRate = salary / 173;
+            if (isWeekend || isHoliday) return Math.round((hourlyRate * 2) * hours + meal);
+            const rate = weekdayRateMap[hours] || hours * 1.5;
+            return Math.round((hourlyRate * rate) + meal);
+        }
+
+        function roundToThousand(v) { const r = v % 1000; return r < 500 ? v - r : v + (1000 - r); }
+
+        async function init() {
+            try {
+                const res = await fetch('/api/me');
+                if (!res.ok) throw new Error();
+                currentUser = await res.json();
+                document.getElementById('userName').textContent = currentUser.name;
+                document.getElementById('userRole').textContent = currentUser.role === 'admin' ? 'Admin' : 'User';
+                document.getElementById('mobileUser').textContent = currentUser.name;
+
+                // Role-based menu visibility
+                if (currentUser.role === 'admin') {
+                    // Admin: hide user menus, show only admin menu
+                    document.getElementById('userMenu').classList.add('hidden');
+                    document.getElementById('adminMenu').classList.remove('hidden');
+                    // Show users section by default for admin
+                    showSection('users');
+                } else {
+                    // User: show user menus, hide admin menu
+                    document.getElementById('userMenu').classList.remove('hidden');
+                    document.getElementById('adminMenu').classList.add('hidden');
+                }
+
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('otDate').value = today;
+                document.getElementById('incomeDate').value = today;
+
+                // Load profile telegram ID
+                if (document.getElementById('profileTelegramId')) {
+                    document.getElementById('profileTelegramId').value = currentUser.telegram_id || '';
+                }
+
+                currentPeriod = getWeekPeriod(today);
+                updatePeriodSelector();
+
+                const now = new Date();
+                ['cfMonth', 'rekapMonth'].forEach(id => {
+                    const sel = document.getElementById(id);
+                    if (sel) monthNames.forEach((m, i) => { sel.innerHTML += `<option value="${i + 1}" ${i === now.getMonth() ? 'selected' : ''}>${m}</option>`; });
+                });
+                ['cfYear', 'rekapYear'].forEach(id => {
+                    const sel = document.getElementById(id);
+                    if (sel) for (let y = now.getFullYear(); y >= now.getFullYear() - 2; y--) sel.innerHTML += `<option value="${y}">${y}</option>`;
+                });
+
+                loadConfig();
+                if (currentUser.role !== 'admin') {
+                    loadDashboard();
+
+                    // Show salary warning if not set
+                    const salaryWarning = document.getElementById('salaryWarning');
+                    if (salaryWarning && (!currentUser.salary || currentUser.salary <= 0)) {
+                        salaryWarning.classList.remove('hidden');
+                    }
+                }
+                setupListeners();
+            } catch (e) { console.error(e); }
+        }
+
+        async function loadConfig() {
+            try {
+                const cfg = await fetch('/api/config').then(r => r.json());
+                document.getElementById('companyName').textContent = cfg.companyName || 'Company';
+            } catch (e) { }
+        }
+
+        async function loadDashboard() {
+            try {
+                const periodOT = await fetch(`/api/overtime/period?start=${currentPeriod.start}&end=${currentPeriod.end}`).then(r => r.json());
+                document.getElementById('statWeekOT').textContent = formatRp(periodOT.rounded_total);
+                document.getElementById('statPayDate').textContent = formatDateID(periodOT.payment_date);
+
+                renderOTList('weeklyOTList', periodOT.records, true);
+                renderOTList('periodOTList', periodOT.records, true);
+
+                // Dashboard Chart
+                renderDashboardChart(periodOT.records);
+
+                document.getElementById('periodTotal').textContent = formatRp(periodOT.rounded_total);
+                document.getElementById('periodPayDate').textContent = 'Bayar: ' + formatDateID(periodOT.payment_date);
+
+                const cf = await fetch('/api/cashflow?month=' + (new Date().getMonth() + 1) + '&year=' + new Date().getFullYear()).then(r => r.json());
+                document.getElementById('statMonthIncome').textContent = formatRp(cf.summary.total_income);
+                document.getElementById('statMonthOT').textContent = formatRp(cf.summary.total_overtime);
+
+                document.getElementById('profileName').value = currentUser.name;
+                document.getElementById('profileSalary').value = currentUser.salary;
+                document.getElementById('profileMeal').value = currentUser.mealAllowance;
+                if (document.getElementById('profilePhone')) {
+                    document.getElementById('profilePhone').value = currentUser.phone || '';
+                }
+                document.getElementById('profileRate').textContent = formatRp(Math.round(currentUser.salary / 173));
+            } catch (e) { console.error(e); }
+        }
+
+        function updatePeriodSelector(targetDate = new Date()) {
+            const select = document.getElementById('periodSelector');
+            const inputSelect = document.getElementById('inputPeriodSelector');
+            const pRangeEl = document.getElementById('periodRange');
+
+            const year = targetDate.getFullYear();
+            const month = targetDate.getMonth();
+
+            let startD = new Date(year, month, 1);
+            startD.setDate(startD.getDate() - 7);
+            const endD = new Date(year, month + 1, 7);
+
+            const periods = [];
+            while (startD <= endD) {
+                const p = getWeekPeriod(startD.toISOString().split('T')[0]);
+                const pStr = JSON.stringify(p);
+                if (!periods.some(x => JSON.stringify(x) === pStr)) {
+                    const pStart = new Date(p.start);
+                    const pEnd = new Date(p.end);
+                    if ((pStart.getMonth() === month && pStart.getFullYear() === year) ||
+                        (pEnd.getMonth() === month && pEnd.getFullYear() === year)) {
+                        periods.push(p);
+                    }
+                }
+                startD.setDate(startD.getDate() + 1);
+            }
+
+            // Populate dashboard period selector
+            if (select) {
+                select.innerHTML = '';
+                periods.forEach(p => {
+                    const opt = document.createElement('option');
+                    opt.value = JSON.stringify(p);
+                    opt.textContent = `${formatDateID(p.start)} - ${formatDateID(p.end)}`;
+                    if (p.start === currentPeriod.start) opt.selected = true;
+                    select.appendChild(opt);
+                });
+            }
+
+            // Populate input lembur period selector
+            if (inputSelect) {
+                inputSelect.innerHTML = '';
+                periods.forEach(p => {
+                    const opt = document.createElement('option');
+                    opt.value = JSON.stringify(p);
+                    opt.textContent = `${formatDateID(p.start)} - ${formatDateID(p.end)}`;
+                    if (p.start === currentPeriod.start) opt.selected = true;
+                    inputSelect.appendChild(opt);
+                });
+            }
+
+            // Update period range display
+            if (pRangeEl) {
+                pRangeEl.textContent = `${formatDateID(currentPeriod.start)} - ${formatDateID(currentPeriod.end)}`;
+            }
+        }
+
+        function changePeriod() {
+            const select = document.getElementById('periodSelector');
+            if (select) {
+                currentPeriod = JSON.parse(select.value);
+                // Sync input period selector
+                const inputSelect = document.getElementById('inputPeriodSelector');
+                if (inputSelect) inputSelect.value = select.value;
+                loadDashboard();
+            }
+        }
+
+        function changeInputPeriod() {
+            const inputSelect = document.getElementById('inputPeriodSelector');
+            if (inputSelect) {
+                currentPeriod = JSON.parse(inputSelect.value);
+                // Sync dashboard period selector
+                const select = document.getElementById('periodSelector');
+                if (select) select.value = inputSelect.value;
+                loadPeriodOT();
+            }
+        }
+
+        let dashboardChart = null;
+        function renderDashboardChart(records) {
+            const ctx = document.getElementById('dashboardChart');
+            if (!ctx) return;
+
+            if (records.length === 0) {
+                if (dashboardChart) dashboardChart.destroy();
+                dashboardChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: { labels: ['Tidak ada data'], datasets: [{ data: [0], backgroundColor: '#e5e7eb' }] },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } }
+                    }
+                });
+                return;
+            }
+
+            const labels = records.map(r => {
+                const d = new Date(r.date);
+                return `${d.getDate()}/${d.getMonth() + 1}`;
+            });
+            const amounts = records.map(r => r.amount);
+            const hours = records.map(r => r.hours);
+
+            if (dashboardChart) dashboardChart.destroy();
+            dashboardChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Jumlah (Rp)',
+                            data: amounts,
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            fill: true,
+                            tension: 0.4,
+                            pointBackgroundColor: '#3b82f6',
+                            pointRadius: 5,
+                            pointHoverRadius: 7,
+                            borderWidth: 3,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Jam',
+                            data: hours,
+                            borderColor: '#06b6d4',
+                            backgroundColor: 'rgba(6, 182, 212, 0.1)',
+                            fill: true,
+                            tension: 0.4,
+                            pointBackgroundColor: '#06b6d4',
+                            pointRadius: 5,
+                            pointHoverRadius: 7,
+                            borderWidth: 3,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(0,0,0,0.8)',
+                            padding: 12,
+                            cornerRadius: 8,
+                            callbacks: {
+                                title: function (context) {
+                                    const idx = context[0].dataIndex;
+                                    return `${formatDateID(records[idx].date)} (${records[idx].day})`;
+                                },
+                                label: function (context) {
+                                    if (context.datasetIndex === 0) {
+                                        return `💰 ${formatRp(context.raw)}`;
+                                    } else {
+                                        return `⏱️ ${context.raw} jam`;
+                                    }
+                                },
+                                afterLabel: function (context) {
+                                    if (context.datasetIndex === 0) {
+                                        const idx = context.dataIndex;
+                                        return records[idx].status === 'cair' ? '✅ Sudah Cair' : '⏳ Belum Cair';
+                                    }
+                                    return '';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { size: 11 } }
+                        },
+                        y: {
+                            type: 'linear',
+                            position: 'left',
+                            grid: { color: 'rgba(0,0,0,0.05)' },
+                            ticks: {
+                                callback: function (value) {
+                                    if (value >= 1000000) return (value / 1000000).toFixed(1) + 'jt';
+                                    if (value >= 1000) return (value / 1000) + 'rb';
+                                    return value;
+                                }
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            position: 'right',
+                            grid: { display: false },
+                            ticks: {
+                                callback: function (value) {
+                                    return value + ' jam';
+                                }
+                            },
+                            min: 0,
+                            max: Math.max(...hours) + 2
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderOTList(containerId, records, editable = false) {
+            const container = document.getElementById(containerId);
+            if (records.length === 0) {
+                container.innerHTML = '<p class="text-gray-400 text-center py-4">Belum ada data</p>';
+                return;
+            }
+            container.innerHTML = records.map(o => {
+                let hoursDisplay = getTimeRange(o.day, o.hours, o.isHoliday);
+                if (o.autoDetected) {
+                    hoursDisplay = '✅ Masuk (auto)';
+                }
+
+                const bgClass = o.autoDetected ? 'bg-green-50 border border-green-200' : 'bg-gray-50';
+
+                // Auto-detected records can be edited (creates a new record that overrides auto-detection)
+                const showEditBtn = editable;
+                const showDeleteBtn = editable && !o.autoDetected;
+
+                return `
+                <div class="flex justify-between items-center p-3 ${bgClass} rounded-xl">
+                    <div>
+                        <p class="font-medium">${formatDateID(o.date)} <span class="text-gray-500 text-sm">(${o.day})</span></p>
+                        <p class="text-sm ${o.autoDetected ? 'text-green-600' : 'text-gray-500'}">${hoursDisplay} ${o.isHoliday ? '🏖️' : ''}</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="text-right">
+                            <p class="font-bold ${o.autoDetected ? 'text-green-600' : 'text-blue-600'}">${formatRp(o.amount)}</p>
+                            ${o.autoDetected ? '<span class="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700">Uang Makan</span>' :
+                        `<span class="text-xs px-2 py-0.5 rounded-full ${o.status === 'cair' ? 'status-cair' : 'status-belum'}">${o.status === 'cair' ? 'Cair ✅' : 'Belum'}</span>`}
+                        </div>
+                        ${showEditBtn ? `<button onclick="${o.autoDetected ? `editAutoDetected('${o.date}')` : `openEditOT('${o.id}', '${o.date}', ${o.hours}, ${o.isHoliday}, '${o.status}')`}" class="text-gray-400 hover:text-blue-600" title="${o.autoDetected ? 'Ubah status hari ini' : 'Edit'}"><i class="fas fa-edit"></i></button>` : ''}
+                        ${showDeleteBtn ? `<button onclick="deleteOT('${o.id}')" class="text-gray-400 hover:text-red-600" title="Hapus"><i class="fas fa-trash"></i></button>` : ''}
+                    </div>
+                </div>
+            `}).join('');
+        }
+
+        function setupListeners() {
+            document.getElementById('otDate').addEventListener('change', function () {
+                const dayIdx = new Date(this.value).getDay();
+                const day = dayNames[dayIdx];
+                document.getElementById('otDayName').textContent = day;
+                updateOvertimeHoursDropdown(dayIdx);
+                updateOTPreview();
+            });
+            document.getElementById('otHours').addEventListener('change', function () {
+                document.getElementById('holidayHoursWrapper').classList.toggle('hidden', this.value !== 'holiday');
+                updateOTPreview();
+            });
+            document.getElementById('otHolidayHours').addEventListener('input', updateOTPreview);
+            document.getElementById('profileSalary').addEventListener('input', function () {
+                document.getElementById('profileRate').textContent = formatRp(Math.round(this.value / 173));
+            });
+
+            // Initial load
+            const dayIdx = new Date(document.getElementById('otDate').value).getDay();
+            document.getElementById('otDayName').textContent = dayNames[dayIdx];
+            updateOvertimeHoursDropdown(dayIdx);
+        }
+
+        // Populate overtime hours dropdown based on day
+        function updateOvertimeHoursDropdown(dayIdx) {
+            const select = document.getElementById('otHours');
+            const isFriday = dayIdx === 5;
+            const isWeekend = dayIdx === 0 || dayIdx === 6;
+
+            let options = '<option value="">-- Pilih --</option>';
+            // For weekdays only: options for presence
+            if (!isWeekend) {
+                options += '<option value="0">✅ Masuk (Tanpa Lembur)</option>';
+                options += '<option value="-1">❌ Tidak Masuk / Cuti / Tanggal Merah</option>';
+            }
+
+            if (isWeekend) {
+                options += '<option value="1">1 jam</option>';
+                options += '<option value="2">2 jam</option>';
+                options += '<option value="3">3 jam</option>';
+                options += '<option value="4">4 jam</option>';
+                options += '<option value="5">5 jam</option>';
+                options += '<option value="6">6 jam</option>';
+                options += '<option value="7">7 jam</option>';
+                options += '<option value="8">8 jam</option>';
+            } else if (isFriday) {
+                options += '<option value="1">1 jam (s/d 18:15)</option>';
+                options += '<option value="1.5">1.5 jam (s/d 19:15)</option>';
+                options += '<option value="2">2 jam (s/d 19:45)</option>';
+                options += '<option value="2.5">2.5 jam (s/d 20:15)</option>';
+                options += '<option value="3">3 jam (s/d 20:45)</option>';
+            } else {
+                // 1 jam ends at 18:00 (no break yet)
+                // 1.5+ jam includes 30min break (18:00-18:30)
+                options += '<option value="1">1 jam (s/d 18:00)</option>';
+                options += '<option value="1.5">1.5 jam (s/d 19:00)</option>';
+                options += '<option value="2">2 jam (s/d 19:30)</option>';
+                options += '<option value="2.5">2.5 jam (s/d 20:00)</option>';
+                options += '<option value="3">3 jam (s/d 20:30)</option>';
+            }
+
+            options += '<option value="holiday">🏖️ Libur tapi Masuk</option>';
+
+            select.innerHTML = options;
+        }
+
+        function updateOTPreview() {
+            const date = document.getElementById('otDate').value;
+            const hoursVal = document.getElementById('otHours').value;
+            let hours = 0, isHoliday = false;
+            if (hoursVal === 'holiday') { hours = parseFloat(document.getElementById('otHolidayHours').value) || 0; isHoliday = true; }
+            else { hours = parseFloat(hoursVal); if (isNaN(hours)) hours = 0; } // Handle 0 and -1 correctly
+
+            const dayName = dayNames[new Date(date).getDay()];
+            const amount = calcOTAmount(currentUser.salary, currentUser.mealAllowance, dayName, hours, isHoliday);
+            document.getElementById('otPreview').textContent = formatRp(amount);
+        }
+
+        function showSection(name) {
+            document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
+            document.getElementById('section-' + name).classList.remove('hidden');
+            document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+            event?.target?.closest('.nav-link')?.classList.add('active');
+
+            if (name === 'overtime') loadPeriodOT();
+            if (name === 'rekap') loadRekap();
+            if (name === 'income') loadIncomeList();
+            if (name === 'cashflow') loadCashflow();
+            if (name === 'users') loadUsers();
+        }
+
+        async function loadPeriodOT() {
+            const periodOT = await fetch(`/api/overtime/period?start=${currentPeriod.start}&end=${currentPeriod.end}`).then(r => r.json());
+            renderOTList('periodOTList', periodOT.records, true);
+            document.getElementById('periodTotal').textContent = formatRp(periodOT.rounded_total);
+            document.getElementById('periodPayDate').textContent = 'Bayar: ' + formatDateID(periodOT.payment_date);
+        }
+
+        async function saveOT() {
+            const date = document.getElementById('otDate').value;
+            const hoursVal = document.getElementById('otHours').value;
+            let hours = 0, isHoliday = false;
+            if (hoursVal === 'holiday') { hours = parseFloat(document.getElementById('otHolidayHours').value) || 0; isHoliday = true; }
+            else { hours = parseFloat(hoursVal); if (isNaN(hours)) hours = 0; }
+
+            if (!date || hoursVal === '') return Swal.fire('Error', 'Lengkapi data!', 'error');
+
+            try {
+                // Check for existing record on this date
+                const checkRes = await fetch(`/api/overtime/period?start=${currentPeriod.start}&end=${currentPeriod.end}`);
+                if (checkRes.ok) {
+                    const periodData = await checkRes.json();
+                    const existingRecord = periodData.records.find(r => r.date === date && !r.autoDetected);
+
+                    if (existingRecord) {
+                        const result = await Swal.fire({
+                            title: 'Data Sudah Ada!',
+                            html: `Sudah ada data untuk tanggal <strong>${formatDateID(date)}</strong>.<br>Ingin mengedit data tersebut?`,
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonText: 'Ya, Edit',
+                            cancelButtonText: 'Batal',
+                            confirmButtonColor: '#3b82f6'
+                        });
+
+                        if (result.isConfirmed) {
+                            // Directly update the existing record with new values
+                            const updateRes = await fetch('/api/overtime/' + existingRecord.id, {
+                                method: 'PUT',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ hours, isHoliday, status: existingRecord.status })
+                            });
+                            if (updateRes.ok) {
+                                Swal.fire('Berhasil', 'Data lembur berhasil diupdate!', 'success');
+                                document.getElementById('otHours').value = '';
+                                document.getElementById('otHolidayHours').value = '';
+                                document.getElementById('holidayHoursWrapper').classList.add('hidden');
+                                document.getElementById('otPreview').textContent = 'Rp 0';
+                                loadDashboard();
+                                loadPeriodOT();
+                            } else {
+                                const e = await updateRes.json();
+                                Swal.fire('Error', e.error || 'Gagal update', 'error');
+                            }
+                        }
+                        return;
+                    }
+                }
+
+                const res = await fetch('/api/overtime', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ date, hours, isHoliday }) });
+                if (res.ok) {
+                    Swal.fire('Berhasil', 'Lembur tersimpan!', 'success');
+                    document.getElementById('otHours').value = '';
+                    document.getElementById('otHolidayHours').value = '';
+                    document.getElementById('holidayHoursWrapper').classList.add('hidden');
+                    document.getElementById('otPreview').textContent = 'Rp 0';
+                    loadDashboard();
+                    loadPeriodOT();
+                } else {
+                    try { const e = await res.json(); Swal.fire('Error', e.error || 'Gagal', 'error'); }
+                    catch { Swal.fire('Error', 'Gagal menyimpan data', 'error'); }
+                }
+            } catch (e) {
+                console.error('Save error:', e);
+                // Data mungkin sudah tersimpan
+                await Swal.fire({ icon: 'info', title: 'Data disimpan', text: 'Silakan refresh halaman jika data tidak muncul.', timer: 2000, showConfirmButton: false });
+                loadDashboard();
+                loadPeriodOT();
+            }
+        }
+
+        // Helper function to generate edit modal options based on day
+        function generateEditHoursOptions(dayIdx, currentHours, isHoliday) {
+            const isFriday = dayIdx === 5;
+            const isWeekend = dayIdx === 0 || dayIdx === 6;
+
+            let options = '<option value="">-- Pilih --</option>';
+
+            // For weekdays only: options for presence
+            if (!isWeekend) {
+                options += `<option value="0" ${currentHours === 0 && !isHoliday ? 'selected' : ''}>✅ Masuk (Tanpa Lembur)</option>`;
+                options += `<option value="-1" ${currentHours === -1 ? 'selected' : ''}>❌ Tidak Masuk / Cuti / Tanggal Merah</option>`;
+            }
+
+            if (isWeekend || isHoliday) {
+                for (let i = 1; i <= 8; i++) {
+                    options += `<option value="${i}" ${currentHours === i ? 'selected' : ''}>${i} jam</option>`;
+                }
+            } else if (isFriday) {
+                options += `<option value="1" ${currentHours === 1 ? 'selected' : ''}>1 jam (s/d 18:15)</option>`;
+                options += `<option value="1.5" ${currentHours === 1.5 ? 'selected' : ''}>1.5 jam (s/d 19:15)</option>`;
+                options += `<option value="2" ${currentHours === 2 ? 'selected' : ''}>2 jam (s/d 19:45)</option>`;
+                options += `<option value="2.5" ${currentHours === 2.5 ? 'selected' : ''}>2.5 jam (s/d 20:15)</option>`;
+                options += `<option value="3" ${currentHours === 3 ? 'selected' : ''}>3 jam (s/d 20:45)</option>`;
+            } else {
+                options += `<option value="1" ${currentHours === 1 ? 'selected' : ''}>1 jam (s/d 18:00)</option>`;
+                options += `<option value="1.5" ${currentHours === 1.5 ? 'selected' : ''}>1.5 jam (s/d 19:00)</option>`;
+                options += `<option value="2" ${currentHours === 2 ? 'selected' : ''}>2 jam (s/d 19:30)</option>`;
+                options += `<option value="2.5" ${currentHours === 2.5 ? 'selected' : ''}>2.5 jam (s/d 20:00)</option>`;
+                options += `<option value="3" ${currentHours === 3 ? 'selected' : ''}>3 jam (s/d 20:30)</option>`;
+            }
+
+            options += `<option value="holiday" ${isHoliday ? 'selected' : ''}>🏖️ Libur tapi Masuk</option>`;
+            options += `<option value="custom">⏱️ Input Jam Manual</option>`;
+
+            return options;
+        }
+
+        // Calculate hours from time range (minus 1 hour break for 12:00-13:00)
+        function calculateHoursFromTimeRange(startTime, endTime) {
+            const [startH, startM] = startTime.split(':').map(Number);
+            const [endH, endM] = endTime.split(':').map(Number);
+
+            let startMinutes = startH * 60 + startM;
+            let endMinutes = endH * 60 + endM;
+
+            if (endMinutes <= startMinutes) return 0;
+
+            let totalMinutes = endMinutes - startMinutes;
+
+            // Subtract break time (12:00-13:00 = 60 minutes) if the range overlaps
+            const breakStart = 12 * 60; // 12:00
+            const breakEnd = 13 * 60;   // 13:00
+
+            if (startMinutes < breakEnd && endMinutes > breakStart) {
+                const overlapStart = Math.max(startMinutes, breakStart);
+                const overlapEnd = Math.min(endMinutes, breakEnd);
+                totalMinutes -= (overlapEnd - overlapStart);
+            }
+
+            return Math.max(0, totalMinutes / 60);
+        }
+
+        async function openEditOT(id, date, hours, isHoliday, status) {
+            const dayIdx = new Date(date).getDay();
+            const dayName = dayNames[dayIdx];
+            const isWeekend = dayIdx === 0 || dayIdx === 6;
+
+            // Determine initial mode
+            let initialMode = 'dropdown'; // dropdown or timerange or direct
+            if (isWeekend || isHoliday) {
+                initialMode = 'timerange';
+            }
+
+            const hoursOptions = generateEditHoursOptions(dayIdx, hours, isHoliday);
+
+            const { value: formValues } = await Swal.fire({
+                title: `<i class="fas fa-edit text-blue-500"></i> Edit Lembur`,
+                html: `
+                <div class="text-left space-y-4">
+                    <div class="bg-blue-50 rounded-lg p-3 text-center">
+                        <p class="font-bold text-blue-800">${formatDateID(date)}</p>
+                        <p class="text-blue-600 text-sm">${dayName} ${isWeekend ? '(Weekend)' : ''}</p>
+                    </div>
+                    
+                    <div id="edit-mode-selector" class="flex gap-2 mb-3">
+                        <button type="button" id="mode-dropdown" onclick="switchEditMode('dropdown')" class="flex-1 py-2 px-3 rounded-lg text-sm font-medium ${!isWeekend && !isHoliday ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}">
+                            <i class="fas fa-list mr-1"></i> Pilih Jam
+                        </button>
+                        <button type="button" id="mode-timerange" onclick="switchEditMode('timerange')" class="flex-1 py-2 px-3 rounded-lg text-sm font-medium ${isWeekend || isHoliday ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}">
+                            <i class="fas fa-clock mr-1"></i> Dari-Sampai
+                        </button>
+                        <button type="button" id="mode-direct" onclick="switchEditMode('direct')" class="flex-1 py-2 px-3 rounded-lg text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200">
+                            <i class="fas fa-keyboard mr-1"></i> Manual
+                        </button>
+                    </div>
+                    
+                    <!-- Dropdown Mode -->
+                    <div id="edit-dropdown-mode" class="${!isWeekend && !isHoliday ? '' : 'hidden'}">
+                        <label class="block text-sm text-gray-600 mb-1">Pilih Status/Jam Lembur</label>
+                        <select id="swal-hours-dropdown" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" onchange="handleEditDropdownChange()">
+                            ${hoursOptions}
+                        </select>
+                        <div id="edit-holiday-hours-wrapper" class="${isHoliday ? '' : 'hidden'} mt-2">
+                            <label class="block text-sm text-gray-600 mb-1">Jumlah Jam Kerja</label>
+                            <input type="number" id="swal-holiday-hours" class="w-full px-3 py-2 border rounded-lg" value="${isHoliday ? hours : 7}" step="0.5" min="0" max="12">
+                        </div>
+                    </div>
+                    
+                    <!-- Time Range Mode -->
+                    <div id="edit-timerange-mode" class="${isWeekend || isHoliday ? '' : 'hidden'}">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-sm text-gray-600 mb-1">Dari Jam</label>
+                                <input type="time" id="swal-start-time" class="w-full px-3 py-2 border rounded-lg" value="08:00" onchange="updateTimeRangeCalculation()">
+                            </div>
+                            <div>
+                                <label class="block text-sm text-gray-600 mb-1">Sampai Jam</label>
+                                <input type="time" id="swal-end-time" class="w-full px-3 py-2 border rounded-lg" value="16:00" onchange="updateTimeRangeCalculation()">
+                            </div>
+                        </div>
+                        <div class="mt-2 p-2 bg-gray-50 rounded-lg text-center">
+                            <span class="text-sm text-gray-500">Total: </span>
+                            <span id="edit-calculated-hours" class="font-bold text-blue-600">7 jam</span>
+                            <span class="text-xs text-gray-400 block">(sudah dikurangi istirahat 12:00-13:00)</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Direct Input Mode -->
+                    <div id="edit-direct-mode" class="hidden">
+                        <label class="block text-sm text-gray-600 mb-1">Masukkan Jam Langsung</label>
+                        <input type="number" id="swal-hours-direct" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" value="${hours}" step="0.5" min="0" max="12">
+                        <div class="mt-2">
+                            <label class="flex items-center gap-2">
+                                <input type="checkbox" id="swal-holiday-direct" ${isHoliday ? 'checked' : ''}>
+                                <span class="text-sm text-gray-700">🏖️ Libur Masuk (rate 2x)</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Status pembayaran dikelola melalui rekap periode -->
+                    <input type="hidden" id="swal-status" value="${status}">
+                    
+                    <div class="bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg p-3 text-center text-white">
+                        <span class="text-sm opacity-80">Estimasi:</span>
+                        <span id="edit-preview-amount" class="font-bold text-lg ml-2">${formatRp(calcOTAmount(currentUser.salary, currentUser.mealAllowance, dayName, hours, isHoliday))}</span>
+                    </div>
+                </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: '<i class="fas fa-save mr-1"></i> Simpan',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#3b82f6',
+                width: 420,
+                didOpen: () => {
+                    // Initialize mode
+                    if (isWeekend || isHoliday) {
+                        switchEditMode('timerange');
+                    }
+                    updateEditPreview();
+                },
+                preConfirm: () => {
+                    return getEditFormValues();
+                }
+            });
+
+            if (formValues) {
+                try {
+                    const res = await fetch('/api/overtime/' + id, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(formValues)
+                    });
+                    if (res.ok) {
+                        await Swal.fire({ icon: 'success', title: 'Tersimpan!', timer: 1000, showConfirmButton: false });
+                        loadDashboard();
+                        loadPeriodOT();
+                    } else {
+                        try {
+                            const e = await res.json();
+                            Swal.fire('Error', e.error || 'Gagal menyimpan', 'error');
+                        } catch {
+                            Swal.fire('Error', 'Gagal menyimpan data', 'error');
+                        }
+                    }
+                } catch (e) {
+                    console.error('Update error:', e);
+                    // Data mungkin sudah tersimpan, coba refresh
+                    await Swal.fire({ icon: 'info', title: 'Data disimpan', text: 'Silakan refresh halaman jika data tidak muncul.', timer: 2000, showConfirmButton: false });
+                    loadDashboard();
+                    loadPeriodOT();
+                }
+            }
+        }
+
+        // Switch between edit modes
+        function switchEditMode(mode) {
+            // Hide all modes
+            document.getElementById('edit-dropdown-mode')?.classList.add('hidden');
+            document.getElementById('edit-timerange-mode')?.classList.add('hidden');
+            document.getElementById('edit-direct-mode')?.classList.add('hidden');
+
+            // Reset button styles
+            document.getElementById('mode-dropdown')?.classList.remove('bg-blue-500', 'text-white');
+            document.getElementById('mode-dropdown')?.classList.add('bg-gray-100', 'text-gray-600');
+            document.getElementById('mode-timerange')?.classList.remove('bg-blue-500', 'text-white');
+            document.getElementById('mode-timerange')?.classList.add('bg-gray-100', 'text-gray-600');
+            document.getElementById('mode-direct')?.classList.remove('bg-blue-500', 'text-white');
+            document.getElementById('mode-direct')?.classList.add('bg-gray-100', 'text-gray-600');
+
+            // Show selected mode
+            if (mode === 'dropdown') {
+                document.getElementById('edit-dropdown-mode')?.classList.remove('hidden');
+                document.getElementById('mode-dropdown')?.classList.add('bg-blue-500', 'text-white');
+                document.getElementById('mode-dropdown')?.classList.remove('bg-gray-100', 'text-gray-600');
+            } else if (mode === 'timerange') {
+                document.getElementById('edit-timerange-mode')?.classList.remove('hidden');
+                document.getElementById('mode-timerange')?.classList.add('bg-blue-500', 'text-white');
+                document.getElementById('mode-timerange')?.classList.remove('bg-gray-100', 'text-gray-600');
+                updateTimeRangeCalculation();
+            } else if (mode === 'direct') {
+                document.getElementById('edit-direct-mode')?.classList.remove('hidden');
+                document.getElementById('mode-direct')?.classList.add('bg-blue-500', 'text-white');
+                document.getElementById('mode-direct')?.classList.remove('bg-gray-100', 'text-gray-600');
+            }
+
+            updateEditPreview();
+        }
+
+        // Handle dropdown change in edit modal
+        function handleEditDropdownChange() {
+            const val = document.getElementById('swal-hours-dropdown')?.value;
+            const holidayWrapper = document.getElementById('edit-holiday-hours-wrapper');
+
+            if (val === 'holiday') {
+                holidayWrapper?.classList.remove('hidden');
+            } else if (val === 'custom') {
+                switchEditMode('direct');
+            } else {
+                holidayWrapper?.classList.add('hidden');
+            }
+            updateEditPreview();
+        }
+
+        // Update time range calculation
+        function updateTimeRangeCalculation() {
+            const startTime = document.getElementById('swal-start-time')?.value || '08:00';
+            const endTime = document.getElementById('swal-end-time')?.value || '16:00';
+            const calculatedHours = calculateHoursFromTimeRange(startTime, endTime);
+
+            const displayEl = document.getElementById('edit-calculated-hours');
+            if (displayEl) {
+                displayEl.textContent = calculatedHours.toFixed(1) + ' jam';
+            }
+            updateEditPreview();
+        }
+
+        // Get form values from edit modal
+        function getEditFormValues() {
+            let hours = 0;
+            let isHoliday = false;
+
+            // Check which mode is active
+            const dropdownMode = document.getElementById('edit-dropdown-mode');
+            const timerangeMode = document.getElementById('edit-timerange-mode');
+            const directMode = document.getElementById('edit-direct-mode');
+
+            if (dropdownMode && !dropdownMode.classList.contains('hidden')) {
+                const val = document.getElementById('swal-hours-dropdown')?.value;
+                if (val === 'holiday') {
+                    isHoliday = true;
+                    hours = parseFloat(document.getElementById('swal-holiday-hours')?.value) || 7;
+                } else {
+                    hours = parseFloat(val) || 0;
+                }
+            } else if (timerangeMode && !timerangeMode.classList.contains('hidden')) {
+                const startTime = document.getElementById('swal-start-time')?.value || '08:00';
+                const endTime = document.getElementById('swal-end-time')?.value || '16:00';
+                hours = calculateHoursFromTimeRange(startTime, endTime);
+                isHoliday = true; // Time range mode typically used for holiday/weekend work
+            } else if (directMode && !directMode.classList.contains('hidden')) {
+                hours = parseFloat(document.getElementById('swal-hours-direct')?.value) || 0;
+                isHoliday = document.getElementById('swal-holiday-direct')?.checked || false;
+            }
+
+            const status = document.getElementById('swal-status')?.value || 'belum';
+
+            return { hours, isHoliday, status };
+        }
+
+        // Update edit preview amount
+        function updateEditPreview() {
+            const formValues = getEditFormValues();
+            const previewEl = document.getElementById('edit-preview-amount');
+            if (previewEl && currentUser) {
+                // Get day name from the modal title if possible
+                const amount = calcOTAmount(currentUser.salary, currentUser.mealAllowance, 'Sabtu', formValues.hours, formValues.isHoliday);
+                previewEl.textContent = formatRp(amount);
+            }
+        }
+
+        // Edit auto-detected record - now opens the interactive modal
+        function editAutoDetected(date) {
+            // Create a new record by opening the input form
+            document.getElementById('otDate').value = date;
+            const dayIdx = new Date(date).getDay();
+            document.getElementById('otDayName').textContent = dayNames[dayIdx];
+            updateOvertimeHoursDropdown(dayIdx);
+            updateOTPreview();
+            // Scroll to input form
+            document.getElementById('otDate').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            Swal.fire({
+                icon: 'info',
+                title: 'Ubah Status Hari',
+                html: `Tanggal <strong>${formatDateID(date)}</strong> sudah dipilih.<br>Pilih status baru dari dropdown dan klik Simpan untuk mengganti status otomatis.`,
+                confirmButtonText: 'OK'
+            });
+        }
+
+        async function deleteOT(id) {
+            const result = await Swal.fire({ title: 'Hapus?', text: 'Data lembur ini akan dihapus', icon: 'warning', showCancelButton: true, confirmButtonText: 'Ya, Hapus', cancelButtonText: 'Batal' });
+            if (!result.isConfirmed) return;
+            await fetch('/api/overtime/' + id, { method: 'DELETE' });
+            loadDashboard();
+            loadPeriodOT();
+        }
+
+        let overtimeChart = null;
+
+        // REKAP LEMBUR
+        async function loadRekap(all = false) {
+            const container = document.getElementById('rekapPeriods');
+            const loading = document.getElementById('rekapLoading');
+
+            // Show loading
+            container.innerHTML = '';
+            loading.classList.remove('hidden');
+
+            let url = '/api/rekap/periods';
+            const month = document.getElementById('rekapMonth').value;
+            const year = document.getElementById('rekapYear').value;
+            if (!all) {
+                url += `?month=${month}&year=${year}`;
+            }
+
+            try {
+                const periods = await fetch(url).then(r => r.json());
+                loading.classList.add('hidden');
+
+                // Update stats
+                const totalCair = periods.filter(p => p.all_cair).length;
+                const totalBelum = periods.filter(p => !p.all_cair).length;
+                document.getElementById('rekapTotalPeriods').textContent = periods.length;
+                document.getElementById('rekapTotalCair').textContent = totalCair;
+                document.getElementById('rekapTotalBelum').textContent = totalBelum;
+
+                // Calculate total amounts
+                const amountCair = periods.filter(p => p.all_cair).reduce((sum, p) => sum + p.rounded_total, 0);
+                const amountBelum = periods.filter(p => !p.all_cair).reduce((sum, p) => sum + p.rounded_total, 0);
+                document.getElementById('rekapAmountCair').textContent = formatRp(amountCair);
+                document.getElementById('rekapAmountBelum').textContent = formatRp(amountBelum);
+
+                // Update chart label
+                if (!all) {
+                    document.getElementById('chartPeriodLabel').textContent = `${monthNames[parseInt(month) - 1]} ${year}`;
+                } else {
+                    document.getElementById('chartPeriodLabel').textContent = 'Semua Data';
+                }
+
+                // Collect all daily records for chart
+                const allRecords = [];
+                periods.forEach(p => {
+                    p.records.forEach(r => {
+                        allRecords.push({
+                            date: r.date,
+                            day: r.day,
+                            hours: r.hours,
+                            amount: r.amount,
+                            status: r.status
+                        });
+                    });
+                });
+
+                // Sort by date
+                allRecords.sort((a, b) => a.date.localeCompare(b.date));
+
+                // Render chart
+                renderOvertimeChart(allRecords);
+
+                if (periods.length === 0) {
+                    container.innerHTML = `
+                        <div class="col-span-full text-center py-16">
+                            <i class="fas fa-calendar-times text-6xl text-gray-300 mb-4"></i>
+                            <p class="text-gray-400 text-lg">Tidak ada data lembur</p>
+                            <p class="text-gray-300 text-sm mt-2">Coba filter bulan lain atau klik "Semua Data"</p>
+                        </div>`;
+                    return;
+                }
+
+                container.innerHTML = periods.map(p => {
+                    let statusBadge, borderClass;
+                    if (p.all_cair && p.has_mismatch) {
+                        statusBadge = '<span class="status-mismatch px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1"><i class="fas fa-exclamation-triangle"></i> Cair (Tidak Sesuai)</span>';
+                        borderClass = 'border-orange-400 bg-orange-50/50';
+                    } else if (p.all_cair) {
+                        statusBadge = '<span class="px-3 py-1.5 rounded-full bg-green-100 text-green-700 text-xs font-semibold flex items-center gap-1"><i class="fas fa-check-circle"></i> Cair</span>';
+                        borderClass = 'border-green-400 bg-green-50/50';
+                    } else {
+                        statusBadge = '<span class="px-3 py-1.5 rounded-full bg-yellow-100 text-yellow-700 text-xs font-semibold flex items-center gap-1"><i class="fas fa-clock"></i> Belum</span>';
+                        borderClass = 'border-transparent hover:border-blue-300';
+                    }
+
+                    return `
+                    <div class="period-card glass rounded-2xl p-6 border-2 ${borderClass}" onclick="showPeriodDetail('${p.start}', '${p.end}')">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <p class="font-bold text-gray-800">${p.start_formatted}</p>
+                                <p class="text-gray-500 text-sm">s/d ${p.end_formatted}</p>
+                            </div>
+                            ${statusBadge}
+                        </div>
+                        <p class="text-3xl font-bold text-blue-600 mb-3">${formatRp(p.rounded_total)}</p>
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-gray-500"><i class="fas fa-calendar-day mr-1"></i>${p.records.length} hari</span>
+                            <span class="text-gray-400"><i class="fas fa-money-bill-wave mr-1"></i>${p.payment_date_formatted || formatDateID(p.payment_date)}</span>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-gray-100 flex justify-center">
+                            <span class="text-blue-500 text-sm font-medium"><i class="fas fa-eye mr-1"></i> Lihat Detail</span>
+                        </div>
+                    </div>
+                `}).join('');
+            } catch (e) {
+                loading.classList.add('hidden');
+                container.innerHTML = '<p class="text-red-400 text-center py-8 col-span-full">Gagal memuat data</p>';
+                console.error(e);
+            }
+        }
+
+        function renderOvertimeChart(records) {
+            const ctx = document.getElementById('overtimeChart').getContext('2d');
+
+            // Destroy existing chart
+            if (overtimeChart) {
+                overtimeChart.destroy();
+            }
+
+            if (records.length === 0) {
+                // Empty state
+                overtimeChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: { labels: ['Tidak ada data'], datasets: [{ data: [0], backgroundColor: '#e5e7eb' }] },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } }
+                    }
+                });
+                return;
+            }
+
+            const labels = records.map(r => {
+                const d = new Date(r.date);
+                return `${d.getDate()} / ${d.getMonth() + 1}`;
+            });
+            const amounts = records.map(r => r.amount);
+            const hours = records.map(r => r.hours);
+            const colors = records.map(r => r.status === 'cair' ? '#22c55e' : '#3b82f6');
+
+            overtimeChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Jumlah (Rp)',
+                            data: amounts,
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            fill: true,
+                            tension: 0.4,
+                            pointBackgroundColor: '#3b82f6',
+                            pointRadius: 5,
+                            pointHoverRadius: 7,
+                            borderWidth: 3,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Jam',
+                            data: hours,
+                            borderColor: '#06b6d4',
+                            backgroundColor: 'rgba(6, 182, 212, 0.1)',
+                            fill: true,
+                            tension: 0.4,
+                            pointBackgroundColor: '#06b6d4',
+                            pointRadius: 5,
+                            pointHoverRadius: 7,
+                            borderWidth: 3,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(0,0,0,0.8)',
+                            padding: 12,
+                            cornerRadius: 8,
+                            callbacks: {
+                                title: function (context) {
+                                    const idx = context[0].dataIndex;
+                                    return `${formatDateID(records[idx].date)
+                                        } (${records[idx].day})`;
+                                },
+                                label: function (context) {
+                                    if (context.datasetIndex === 0) {
+                                        return `💰 ${formatRp(context.raw)} `;
+                                    } else {
+                                        return `⏱️ ${context.raw} jam`;
+                                    }
+                                },
+                                afterLabel: function (context) {
+                                    if (context.datasetIndex === 0) {
+                                        const idx = context.dataIndex;
+                                        return records[idx].status === 'cair' ? '✅ Sudah Cair' : '⏳ Belum Cair';
+                                    }
+                                    return '';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { size: 11 } }
+                        },
+                        y: {
+                            type: 'linear',
+                            position: 'left',
+                            grid: { color: 'rgba(0,0,0,0.05)' },
+                            ticks: {
+                                callback: function (value) {
+                                    if (value >= 1000000) return (value / 1000000).toFixed(1) + 'jt';
+                                    if (value >= 1000) return (value / 1000) + 'rb';
+                                    return value;
+                                }
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            position: 'right',
+                            grid: { display: false },
+                            ticks: {
+                                callback: function (value) {
+                                    return value + ' jam';
+                                }
+                            },
+                            min: 0,
+                            max: Math.max(...hours) + 2
+                        }
+                    }
+                }
+            });
+        }
+
+        async function showPeriodDetail(start, end) {
+            // Show loading
+            Swal.fire({ title: 'Memuat...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+            const periods = await fetch('/api/rekap/periods').then(r => r.json());
+            const period = periods.find(p => p.start === start && p.end === end);
+            if (!period) { Swal.close(); return; }
+
+            let detailHTML = `
+                <div class="text-left">
+                    <div class="bg-blue-50 rounded-lg p-3 mb-4 text-center">
+                        <p class="text-sm text-blue-600">Tanggal Bayar</p>
+                        <p class="font-bold text-blue-700">${period.payment_date_formatted || formatDateID(period.payment_date)}</p>
+                    </div>
+                    <div class="max-h-64 overflow-y-auto space-y-2" id="rekapDetailList">`;
+
+            period.records.forEach(o => {
+                let statusClass = o.status === 'cair' ? 'bg-green-50 border-green-200' : 'bg-yellow-50 border-yellow-200';
+                if (o.autoDetected) statusClass = 'bg-green-50 border-green-300';
+
+                const isLegacy = o.legacy ? 'true' : 'false';
+
+                let hoursDisplay = getTimeRange(o.day, o.hours, o.isHoliday);
+                const isMasukOnly = o.autoDetected || (o.hours === 0 && !o.isHoliday);
+                if (isMasukOnly) {
+                    hoursDisplay = '✅ Masuk (auto)';
+                    statusClass = 'bg-green-50 border-green-300';
+                }
+
+                const showActions = !o.legacy && !isMasukOnly;
+
+                detailHTML += `
+                    <div class="flex items-center gap-2 p-3 ${statusClass} border rounded-lg" id="rekap-item-${o.id}">
+                        <div class="flex-1">
+                            <p class="font-semibold text-gray-800">${formatDateID(o.date)}</p>
+                            <p class="text-sm ${o.autoDetected ? 'text-green-600' : 'text-gray-500'}">${o.day} • ${hoursDisplay} ${o.isHoliday ? '🏖️' : ''}</p>
+                        </div>
+                        <div class="text-right mr-2">
+                            <p class="font-bold ${isMasukOnly ? 'text-green-600' : 'text-blue-600'}">${formatRp(o.amount)}</p>
+                            ${isMasukOnly ? '<p class="text-xs text-green-600">Uang Makan</p>' :
+                        `<p class="text-xs ${o.status === 'cair' ? 'text-green-600' : 'text-yellow-600'}">${o.status === 'cair' ? '✅' : '⏳'}</p>`}
+                        </div>
+                        ${showActions ? `
+                        <div class="flex flex-col gap-1">
+                            <button onclick="editOTFromRekap('${o.id}', '${o.date}', ${o.hours}, ${o.isHoliday}, '${o.status}', '${start}', '${end}')" class="text-blue-500 hover:text-blue-700 text-sm px-2 py-1 bg-blue-100 rounded" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="deleteOTFromRekap('${o.id}', '${start}', '${end}')" class="text-red-500 hover:text-red-700 text-sm px-2 py-1 bg-red-100 rounded" title="Hapus">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                        ` : (o.legacy ? '<span class="text-xs text-gray-400 px-2">Legacy</span>' : '')}
+                    </div>`;
+            });
+
+            detailHTML += `
+                    </div>
+                    <div class="bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg p-4 mt-4 text-center text-white">
+                        <p class="text-blue-100 text-sm">Total Periode</p>
+                        <p class="text-2xl font-bold">${formatRp(period.rounded_total)}</p>
+                    </div>
+                </div>`;
+
+            const result = await Swal.fire({
+                title: `<span class="text-lg">${period.start_formatted}</span><br><span class="text-sm text-gray-500">s/d ${period.end_formatted}</span>`,
+                html: detailHTML,
+                showCancelButton: true,
+                confirmButtonText: period.all_cair ? '<i class="fas fa-times-circle mr-2"></i>Tandai Belum Cair' : '<i class="fas fa-check-circle mr-2"></i>Tandai Sudah Cair',
+                confirmButtonColor: period.all_cair ? '#f59e0b' : '#22c55e',
+                cancelButtonText: 'Tutup',
+                width: 520,
+                customClass: { popup: 'rounded-2xl' }
+            });
+
+            if (result.isConfirmed) {
+                if (period.all_cair) {
+                    // Mark as belum cair (simple toggle back)
+                    await fetch('/api/rekap/period/status', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ start, end, status: 'belum' }) });
+                    await Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'Status diubah ke "Belum Cair"', timer: 1500, showConfirmButton: false });
+                } else {
+                    // Mark as cair - ask for nominal confirmation
+                    const confirmResult = await Swal.fire({
+                        title: 'Konfirmasi Nominal',
+                        html: `<p class="mb-4">Total periode: <strong>${formatRp(period.rounded_total)}</strong></p>
+                               <p class="text-gray-600">Apakah nominal yang masuk sudah sesuai?</p>`,
+                        icon: 'question',
+                        showDenyButton: true,
+                        showCancelButton: true,
+                        confirmButtonText: '<i class="fas fa-check mr-2"></i>Sesuai',
+                        denyButtonText: '<i class="fas fa-times mr-2"></i>Tidak Sesuai',
+                        cancelButtonText: 'Batal',
+                        confirmButtonColor: '#22c55e',
+                        denyButtonColor: '#f59e0b'
+                    });
+
+                    if (confirmResult.isConfirmed) {
+                        // Nominal matches - mark as cair
+                        await fetch('/api/rekap/period/status', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ start, end, status: 'cair' }) });
+                        await Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'Periode ditandai "Sudah Cair"', timer: 1500, showConfirmButton: false });
+                    } else if (confirmResult.isDenied) {
+                        // Nominal doesn't match - ask for real amount
+                        const { value: realAmount } = await Swal.fire({
+                            title: 'Nominal Tidak Sesuai',
+                            html: `<p class="text-gray-600 mb-3">Total seharusnya: <strong>${formatRp(period.rounded_total)}</strong></p>
+                                   <label class="block text-sm text-gray-600 mb-2">Masukkan nominal real yang diterima:</label>`,
+                            input: 'number',
+                            inputPlaceholder: 'Contoh: 150000',
+                            inputAttributes: { min: 0 },
+                            showCancelButton: true,
+                            confirmButtonText: 'Simpan',
+                            cancelButtonText: 'Batal',
+                            confirmButtonColor: '#f59e0b',
+                            inputValidator: (value) => {
+                                if (!value || value <= 0) return 'Masukkan nominal yang valid';
+                            }
+                        });
+
+                        if (realAmount) {
+                            // Save as cair_mismatch with real amount
+                            await fetch('/api/rekap/period/status', {
+                                method: 'PUT',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ start, end, status: 'cair_mismatch', realAmount: parseInt(realAmount) })
+                            });
+                            await Swal.fire({
+                                icon: 'warning',
+                                title: 'Dicatat!',
+                                html: `Periode ditandai "Cair (Tidak Sesuai)"<br><small>Real: ${formatRp(parseInt(realAmount))} vs Seharusnya: ${formatRp(period.rounded_total)}</small>`,
+                                timer: 2500,
+                                showConfirmButton: false
+                            });
+                        }
+                    }
+                }
+                loadRekap();
+                loadDashboard();
+            }
+        }
+
+        // Edit OT from Rekap popup - uses the same interactive modal as openEditOT
+        async function editOTFromRekap(id, date, hours, isHoliday, status, periodStart, periodEnd) {
+            Swal.close();
+
+            const dayIdx = new Date(date).getDay();
+            const dayName = dayNames[dayIdx];
+            const isWeekend = dayIdx === 0 || dayIdx === 6;
+
+            const hoursOptions = generateEditHoursOptions(dayIdx, hours, isHoliday);
+
+            const { value: formValues } = await Swal.fire({
+                title: `<i class="fas fa-edit text-blue-500"></i> Edit Lembur`,
+                html: `
+                <div class="text-left space-y-4">
+                    <div class="bg-blue-50 rounded-lg p-3 text-center">
+                        <p class="font-bold text-blue-800">${formatDateID(date)}</p>
+                        <p class="text-blue-600 text-sm">${dayName} ${isWeekend ? '(Weekend)' : ''}</p>
+                    </div>
+                    
+                    <div id="edit-mode-selector" class="flex gap-2 mb-3">
+                        <button type="button" id="mode-dropdown" onclick="switchEditMode('dropdown')" class="flex-1 py-2 px-3 rounded-lg text-sm font-medium ${!isWeekend && !isHoliday ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}">
+                            <i class="fas fa-list mr-1"></i> Pilih Jam
+                        </button>
+                        <button type="button" id="mode-timerange" onclick="switchEditMode('timerange')" class="flex-1 py-2 px-3 rounded-lg text-sm font-medium ${isWeekend || isHoliday ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}">
+                            <i class="fas fa-clock mr-1"></i> Dari-Sampai
+                        </button>
+                        <button type="button" id="mode-direct" onclick="switchEditMode('direct')" class="flex-1 py-2 px-3 rounded-lg text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200">
+                            <i class="fas fa-keyboard mr-1"></i> Manual
+                        </button>
+                    </div>
+                    
+                    <!-- Dropdown Mode -->
+                    <div id="edit-dropdown-mode" class="${!isWeekend && !isHoliday ? '' : 'hidden'}">
+                        <label class="block text-sm text-gray-600 mb-1">Pilih Status/Jam Lembur</label>
+                        <select id="swal-hours-dropdown" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" onchange="handleEditDropdownChange()">
+                            ${hoursOptions}
+                        </select>
+                        <div id="edit-holiday-hours-wrapper" class="${isHoliday ? '' : 'hidden'} mt-2">
+                            <label class="block text-sm text-gray-600 mb-1">Jumlah Jam Kerja</label>
+                            <input type="number" id="swal-holiday-hours" class="w-full px-3 py-2 border rounded-lg" value="${isHoliday ? hours : 7}" step="0.5" min="0" max="12">
+                        </div>
+                    </div>
+                    
+                    <!-- Time Range Mode -->
+                    <div id="edit-timerange-mode" class="${isWeekend || isHoliday ? '' : 'hidden'}">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-sm text-gray-600 mb-1">Dari Jam</label>
+                                <input type="time" id="swal-start-time" class="w-full px-3 py-2 border rounded-lg" value="08:00" onchange="updateTimeRangeCalculation()">
+                            </div>
+                            <div>
+                                <label class="block text-sm text-gray-600 mb-1">Sampai Jam</label>
+                                <input type="time" id="swal-end-time" class="w-full px-3 py-2 border rounded-lg" value="16:00" onchange="updateTimeRangeCalculation()">
+                            </div>
+                        </div>
+                        <div class="mt-2 p-2 bg-gray-50 rounded-lg text-center">
+                            <span class="text-sm text-gray-500">Total: </span>
+                            <span id="edit-calculated-hours" class="font-bold text-blue-600">7 jam</span>
+                            <span class="text-xs text-gray-400 block">(sudah dikurangi istirahat 12:00-13:00)</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Direct Input Mode -->
+                    <div id="edit-direct-mode" class="hidden">
+                        <label class="block text-sm text-gray-600 mb-1">Masukkan Jam Langsung</label>
+                        <input type="number" id="swal-hours-direct" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" value="${hours}" step="0.5" min="0" max="12">
+                        <div class="mt-2">
+                            <label class="flex items-center gap-2">
+                                <input type="checkbox" id="swal-holiday-direct" ${isHoliday ? 'checked' : ''}>
+                                <span class="text-sm text-gray-700">🏖️ Libur Masuk (rate 2x)</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Status pembayaran dikelola melalui rekap periode -->
+                    <input type="hidden" id="swal-status" value="${status}">
+                    
+                    <div class="bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg p-3 text-center text-white">
+                        <span class="text-sm opacity-80">Estimasi:</span>
+                        <span id="edit-preview-amount" class="font-bold text-lg ml-2">${formatRp(calcOTAmount(currentUser.salary, currentUser.mealAllowance, dayName, hours, isHoliday))}</span>
+                    </div>
+                </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: '<i class="fas fa-save mr-1"></i> Simpan',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#3b82f6',
+                width: 420,
+                didOpen: () => {
+                    if (isWeekend || isHoliday) {
+                        switchEditMode('timerange');
+                    }
+                    updateEditPreview();
+                },
+                preConfirm: () => {
+                    return getEditFormValues();
+                }
+            });
+
+            if (formValues) {
+                try {
+                    const res = await fetch('/api/overtime/' + id, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(formValues)
+                    });
+                    if (res.ok) {
+                        await Swal.fire({ icon: 'success', title: 'Tersimpan!', timer: 1000, showConfirmButton: false });
+                        loadRekap();
+                        loadDashboard();
+                        showPeriodDetail(periodStart, periodEnd);
+                    } else {
+                        try {
+                            const e = await res.json();
+                            Swal.fire('Error', e.error || 'Gagal menyimpan', 'error');
+                        } catch {
+                            Swal.fire('Error', 'Gagal menyimpan data', 'error');
+                        }
+                    }
+                } catch (e) {
+                    console.error('Update error:', e);
+                    // Data mungkin sudah tersimpan, coba refresh
+                    await Swal.fire({ icon: 'info', title: 'Data disimpan', text: 'Silakan refresh halaman jika data tidak muncul.', timer: 2000, showConfirmButton: false });
+                    loadRekap();
+                    loadDashboard();
+                    showPeriodDetail(periodStart, periodEnd);
+                }
+            } else {
+                showPeriodDetail(periodStart, periodEnd);
+            }
+        }
+
+        // Delete OT from Rekap popup
+        async function deleteOTFromRekap(id, periodStart, periodEnd) {
+            const result = await Swal.fire({
+                title: 'Hapus Data?',
+                text: 'Data lembur ini akan dihapus permanen',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Hapus',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#ef4444'
+            });
+
+            if (result.isConfirmed) {
+                try {
+                    await fetch('/api/overtime/' + id, { method: 'DELETE' });
+                    await Swal.fire({ icon: 'success', title: 'Terhapus!', timer: 1000, showConfirmButton: false });
+                    loadRekap();
+                    loadDashboard();
+                    showPeriodDetail(periodStart, periodEnd);
+                } catch (e) {
+                    Swal.fire('Error', 'Gagal menghapus', 'error');
+                }
+            }
+        }
+
+        // Income
+        async function loadIncomeList() {
+            try {
+                const income = await fetch('/api/income').then(r => r.json());
+                const container = document.getElementById('incomeList');
+                if (income.length === 0) { container.innerHTML = '<p class="text-gray-400 text-center py-4">Belum ada data</p>'; return; }
+                const typeIcons = { gaji: '💵', bonus: '🎁', lainnya: '📦' };
+                container.innerHTML = income.reverse().map(i => `
+            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
+                <div><p class="font-medium">${typeIcons[i.type] || '📦'} ${i.type}</p><p class="text-gray-500 text-xs">${formatDateID(i.date)}${i.note ? ' - ' + i.note : ''}</p></div>
+                <div class="flex items-center gap-3"><p class="font-bold text-green-600">${formatRp(i.amount)}</p><button onclick="deleteIncome('${i.id}')" class="text-gray-400 hover:text-red-600"><i class="fas fa-trash"></i></button></div>
+            </div>
+            `).join('');
+            } catch (e) { console.error(e); }
+        }
+
+        async function saveIncome() {
+            const data = { date: document.getElementById('incomeDate').value, type: document.getElementById('incomeType').value, amount: document.getElementById('incomeAmount').value, note: document.getElementById('incomeNote').value };
+            if (!data.amount) return Swal.fire('Error', 'Masukkan jumlah!', 'error');
+            try {
+                const res = await fetch('/api/income', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+                if (res.ok) { Swal.fire('Berhasil', 'Pemasukan tersimpan!', 'success'); document.getElementById('incomeAmount').value = ''; document.getElementById('incomeNote').value = ''; loadIncomeList(); loadDashboard(); }
+                else { const e = await res.json(); Swal.fire('Error', e.error || 'Gagal', 'error'); }
+            } catch (e) { Swal.fire('Error', 'Koneksi gagal', 'error'); }
+        }
+
+        async function deleteIncome(id) {
+            const result = await Swal.fire({ title: 'Hapus?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Ya, Hapus' });
+            if (!result.isConfirmed) return;
+            await fetch('/api/income/' + id, { method: 'DELETE' });
+            loadIncomeList();
+            loadDashboard();
+        }
+
+        // Cashflow
+        async function loadCashflow() {
+            const month = document.getElementById('cfMonth').value;
+            const year = document.getElementById('cfYear').value;
+            try {
+                const cf = await fetch(`/api/cashflow?month=${month}&year=${year}`).then(r => r.json());
+                document.getElementById('cfIncome').textContent = formatRp(cf.summary.total_income);
+                document.getElementById('cfOvertime').textContent = formatRp(cf.summary.total_overtime);
+                document.getElementById('cfTotal').textContent = formatRp(cf.summary.grand_total);
+
+                const typeIcons = { gaji: '💵', bonus: '🎁', lainnya: '📦' };
+                document.getElementById('cfIncomeList').innerHTML = cf.income.length === 0 ? '<p class="text-gray-400 text-center">Tidak ada data</p>' :
+                    cf.income.map(i => `<div class="flex justify-between p-2 bg-green-50 rounded-lg"><span>${formatDateID(i.date)} - ${typeIcons[i.type] || '📦'}</span><span class="font-bold text-green-600">${formatRp(i.amount)}</span></div>`).join('');
+
+                const paidOT = cf.overtime.filter(o => o.status === 'cair');
+                document.getElementById('cfOvertimeList').innerHTML = paidOT.length === 0 ? '<p class="text-gray-400 text-center">Tidak ada lembur cair</p>' :
+                    paidOT.map(o => `<div class="flex justify-between p-2 bg-blue-50 rounded-lg"><span>${formatDateID(o.date)} (${o.day})</span><span class="font-bold text-blue-600">${formatRp(o.amount)}</span></div>`).join('');
+            } catch (e) { console.error(e); }
+        }
+
+        // Profile
+        async function saveProfile() {
+            try {
+                const data = {
+                    name: document.getElementById('profileName').value,
+                    phone: document.getElementById('profilePhone')?.value || null,
+                    salary: document.getElementById('profileSalary').value,
+                    mealAllowance: document.getElementById('profileMeal').value,
+                    telegram_id: document.getElementById('profileTelegramId')?.value || null
+                };
+                const res = await fetch('/api/profile', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+                if (res.ok) { const result = await res.json(); currentUser = result.user; Swal.fire('Berhasil', 'Profil tersimpan!', 'success'); loadDashboard(); }
+                else { const e = await res.json(); Swal.fire('Error', e.error || 'Gagal', 'error'); }
+            } catch (e) { Swal.fire('Error', 'Koneksi gagal', 'error'); }
+        }
+
+        // Change password
+        async function changePassword() {
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (!currentPassword || !newPassword) {
+                return Swal.fire('Error', 'Semua field harus diisi!', 'error');
+            }
+            if (newPassword !== confirmPassword) {
+                return Swal.fire('Error', 'Konfirmasi password tidak cocok!', 'error');
+            }
+            if (newPassword.length < 3) {
+                return Swal.fire('Error', 'Password minimal 3 karakter!', 'error');
+            }
+
+            try {
+                const res = await fetch('/api/profile/password', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ currentPassword, newPassword })
+                });
+                if (res.ok) {
+                    Swal.fire('Berhasil', 'Password berhasil diubah!', 'success');
+                    document.getElementById('currentPassword').value = '';
+                    document.getElementById('newPassword').value = '';
+                    document.getElementById('confirmPassword').value = '';
+                } else {
+                    const e = await res.json();
+                    Swal.fire('Error', e.error || 'Gagal', 'error');
+                }
+            } catch (e) {
+                Swal.fire('Error', 'Koneksi gagal', 'error');
+            }
+        }
+
+        // Users
+        async function loadUsers() {
+            try {
+                const users = await fetch('/api/users').then(r => r.json());
+                document.getElementById('usersTable').innerHTML = users.map(u => `
+            <tr class="border-b border-gray-100">
+                <td class="py-3 font-medium">${u.name}</td>
+                <td class="py-3">${u.username}</td>
+                <td class="py-3 font-mono text-sm">${u.phone || '-'}</td>
+                <td class="py-3 font-mono text-sm">${u.telegram_id || '-'}</td>
+                <td class="py-3">
+                    <button onclick="editUser('${u.id}')" class="text-blue-500 hover:text-blue-700 mr-2" title="Edit"><i class="fas fa-edit"></i></button>
+                    <button onclick="resetUserPassword('${u.id}', '${u.name}')" class="text-yellow-500 hover:text-yellow-700 mr-2" title="Reset Password"><i class="fas fa-key"></i></button>
+                    <button onclick="deleteUser('${u.id}')" class="text-red-400 hover:text-red-600" title="Hapus"><i class="fas fa-trash"></i></button>
+                </td>
+            </tr>
+                `).join('');
+            } catch (e) { console.error(e); }
+        }
+
+        // Reset user password (Admin)
+        async function resetUserPassword(userId, userName) {
+            const result = await Swal.fire({
+                title: 'Reset Password?',
+                html: `Password untuk <strong>${userName}</strong> akan direset ke <code>123</code>`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Reset',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#f59e0b'
+            });
+            if (!result.isConfirmed) return;
+
+            try {
+                const res = await fetch(`/api/users/${userId}/reset-password`, { method: 'POST' });
+                if (res.ok) {
+                    Swal.fire('Berhasil', `Password ${userName} sudah direset ke "123"`, 'success');
+                } else {
+                    const e = await res.json();
+                    Swal.fire('Error', e.error || 'Gagal', 'error');
+                }
+            } catch (e) {
+                Swal.fire('Error', 'Koneksi gagal', 'error');
+            }
+        }
+
+        function openUserModal(user = null) {
+            document.getElementById('userModalTitle').textContent = user ? 'Edit User' : 'Tambah User';
+            document.getElementById('editUserId').value = user?.id || '';
+            document.getElementById('formUsername').value = user?.username || '';
+            document.getElementById('formPassword').value = '';
+            document.getElementById('formName').value = user?.name || '';
+            document.getElementById('formTelegramId').value = user?.telegram_id || '';
+            document.getElementById('formUsername').disabled = !!user;
+            // Hide password field when editing (admin cannot change password)
+            document.getElementById('passwordFieldWrapper').classList.toggle('hidden', !!user);
+            document.getElementById('userModal').classList.remove('hidden');
+        }
+
+        function closeUserModal() { document.getElementById('userModal').classList.add('hidden'); }
+
+        async function editUser(id) { const users = await fetch('/api/users').then(r => r.json()); const user = users.find(u => u.id === id); if (user) openUserModal(user); }
+
+        document.getElementById('userForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('editUserId').value;
+            const data = { username: document.getElementById('formUsername').value, name: document.getElementById('formName').value, telegram_id: document.getElementById('formTelegramId').value || null };
+            // Only include password for new users
+            if (!id) {
+                data.password = document.getElementById('formPassword').value || '123';
+            }
+            try {
+                const res = await fetch(id ? '/api/users/' + id : '/api/users', { method: id ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+                if (res.ok) { closeUserModal(); loadUsers(); } else { const err = await res.json(); Swal.fire('Error', err.error || 'Gagal', 'error'); }
+            } catch (e) { Swal.fire('Error', 'Koneksi gagal', 'error'); }
+        });
+
+        async function deleteUser(id) {
+            const result = await Swal.fire({ title: 'Hapus user?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Ya, Hapus' });
+            if (!result.isConfirmed) return;
+            await fetch('/api/users/' + id, { method: 'DELETE' });
+            loadUsers();
+        }
+
+        // Admin Broadcast Modal
+        async function openBroadcastModal() {
+            const { value: message } = await Swal.fire({
+                title: '<i class="fas fa-bullhorn text-blue-500 mr-2"></i> Broadcast Pesan',
+                html: `< p class= "text-gray-600 text-sm mb-4" > Pesan akan dikirim ke semua user yang memiliki Telegram ID</p> `,
+                input: 'textarea',
+                inputPlaceholder: 'Ketik pesan pengumuman...',
+                inputAttributes: { maxlength: 1000 },
+                showCancelButton: true,
+                confirmButtonText: '<i class="fas fa-paper-plane mr-2"></i>Kirim',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#3b82f6',
+                inputValidator: (value) => {
+                    if (!value || value.trim().length === 0) return 'Pesan tidak boleh kosong';
+                    if (value.length > 1000) return 'Pesan maksimal 1000 karakter';
+                }
+            });
+
+            if (message) {
+                try {
+                    Swal.fire({ title: 'Mengirim...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+                    const res = await fetch('/api/admin/broadcast', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ message: message.trim() })
+                    });
+                    const data = await res.json();
+                    if (res.ok) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Broadcast Terkirim!',
+                            html: `< p > Terkirim: ${data.sent} user</p > ${data.failed > 0 ? `<p class="text-orange-500">Gagal: ${data.failed} user</p>` : ''}`
+                        });
+                    } else {
+                        Swal.fire('Error', data.error || 'Gagal mengirim', 'error');
+                    }
+                } catch (e) {
+                    Swal.fire('Error', 'Koneksi gagal', 'error');
+                }
+            }
+        }
+
+        // ==================== SCHEDULED JOBS ====================
+        let scheduledJobsData = [];
+
+        async function loadScheduledJobs() {
+            const container = document.getElementById('scheduledJobsList');
+            if (!container) return;
+
+            try {
+                scheduledJobsData = await fetch('/api/admin/scheduled-jobs').then(r => r.json());
+
+                if (scheduledJobsData.length === 0) {
+                    container.innerHTML = '<p class="text-gray-400 text-center py-8">Belum ada jadwal pesan. Klik "Tambah Jadwal" untuk buat baru.</p>';
+                    return;
+                }
+
+                container.innerHTML = scheduledJobsData.map(job => {
+                    const statusClass = job.enabled ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500';
+                    const statusText = job.enabled ? 'Aktif' : 'Nonaktif';
+
+                    let scheduleText = '';
+                    switch (job.schedule?.type) {
+                        case 'monthly_date': scheduleText = `Tiap tanggal ${job.schedule.day}, jam ${job.schedule.time}`; break;
+                        case 'weekly_day': scheduleText = `Tiap ${job.schedule.day}, jam ${job.schedule.time}`; break;
+                        case 'daily_time': scheduleText = `Tiap hari jam ${job.schedule.time}`; break;
+                        case 'once': scheduleText = `Sekali: ${formatDateID(job.schedule.date)
+                            }, jam ${job.schedule.time} `; break;
+                        default: scheduleText = 'Tidak diatur';
+                    }
+
+                    return `
+            < div class="flex flex-col md:flex-row justify-between items-start md:items-center p-4 bg-gray-50 rounded-xl gap-4" >
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-1">
+                                <h4 class="font-semibold text-gray-800">${job.name}</h4>
+                                <span class="text-xs px-2 py-0.5 rounded-full ${statusClass}">${statusText}</span>
+                            </div>
+                            <p class="text-sm text-gray-500">${scheduleText}</p>
+                            <p class="text-xs text-gray-400 mt-1 truncate max-w-md">${job.message.substring(0, 80)}${job.message.length > 80 ? '...' : ''}</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="testScheduledJob('${job.id}')" class="px-3 py-1.5 rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-200 text-sm" title="Test Preview">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                            <button onclick="toggleJobStatus('${job.id}', ${!job.enabled})" class="px-3 py-1.5 rounded-lg ${job.enabled ? 'bg-yellow-100 text-yellow-600 hover:bg-yellow-200' : 'bg-green-100 text-green-600 hover:bg-green-200'} text-sm" title="${job.enabled ? 'Nonaktifkan' : 'Aktifkan'}">
+                                <i class="fas fa-${job.enabled ? 'pause' : 'play'}"></i>
+                            </button>
+                            <button onclick="editScheduledJob('${job.id}')" class="px-3 py-1.5 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 text-sm" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="deleteScheduledJob('${job.id}')" class="px-3 py-1.5 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 text-sm" title="Hapus">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div > `;
+                }).join('');
+            } catch (e) {
+                console.error(e);
+                container.innerHTML = '<p class="text-red-400 text-center py-4">Gagal memuat data</p>';
+            }
+        }
+
+        let allUsersCache = [];
+
+        async function openScheduledJobModal(job = null) {
+            document.getElementById('jobModalTitle').textContent = job ? 'Edit Jadwal Pesan' : 'Tambah Jadwal Pesan';
+            document.getElementById('editJobId').value = job?.id || '';
+            document.getElementById('jobName').value = job?.name || '';
+            document.getElementById('jobMessage').value = job?.message || '';
+            document.getElementById('jobScheduleType').value = job?.schedule?.type || 'monthly_date';
+            document.getElementById('jobTime').value = job?.schedule?.time || '08:00';
+            document.getElementById('jobDay').value = job?.schedule?.day || 25;
+            document.getElementById('jobWeekDay').value = job?.schedule?.day || 'Senin';
+            document.getElementById('jobOnceDate').value = job?.schedule?.date || new Date().toISOString().split('T')[0];
+            updateScheduleFields();
+
+            // Populate user checkboxes
+            await populateTargetUsers(job?.targets?.user_ids || []);
+
+            document.getElementById('scheduledJobModal').classList.remove('hidden');
+        }
+
+        async function populateTargetUsers(selectedIds = []) {
+            try {
+                allUsersCache = await fetch('/api/users').then(r => r.json());
+                const container = document.getElementById('jobTargetUsersList');
+                const nonAdmins = allUsersCache.filter(u => u.role !== 'admin');
+
+                container.innerHTML = nonAdmins.map(u => `
+            < label class="flex items-center gap-2 py-1 cursor-pointer hover:bg-gray-50 px-1 rounded" >
+                <input type="checkbox" class="job-target-user w-4 h-4" value="${u.id}" ${selectedIds.includes(u.id) ? 'checked' : ''}>
+                    <span class="text-gray-700 text-sm">${u.name}</span>
+                </label>
+        `).join('');
+
+                // Check "All" if all users are selected or no specific selection (default all)
+                const allCheckbox = document.getElementById('jobTargetAll');
+                allCheckbox.checked = selectedIds.length === 0 || selectedIds.length === nonAdmins.length;
+                if (allCheckbox.checked) {
+                    document.querySelectorAll('.job-target-user').forEach(cb => cb.checked = true);
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        function toggleAllTargetUsers(checked) {
+            document.querySelectorAll('.job-target-user').forEach(cb => cb.checked = checked);
+        }
+
+        function closeScheduledJobModal() {
+            document.getElementById('scheduledJobModal').classList.add('hidden');
+        }
+
+        function updateScheduleFields() {
+            const type = document.getElementById('jobScheduleType').value;
+            document.getElementById('monthlyParam').classList.toggle('hidden', type !== 'monthly_date');
+            document.getElementById('weeklyParam').classList.toggle('hidden', type !== 'weekly_day');
+            document.getElementById('onceParam').classList.toggle('hidden', type !== 'once');
+        }
+
+        function editScheduledJob(id) {
+            const job = scheduledJobsData.find(j => j.id === id);
+            if (job) openScheduledJobModal(job);
+        }
+
+        async function deleteScheduledJob(id) {
+            const result = await Swal.fire({ title: 'Hapus jadwal ini?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Ya, Hapus', confirmButtonColor: '#ef4444' });
+            if (!result.isConfirmed) return;
+
+            try {
+                await fetch(`/ api / admin / scheduled - jobs / ${id} `, { method: 'DELETE' });
+                loadScheduledJobs();
+                Swal.fire({ icon: 'success', title: 'Dihapus!', timer: 1500, showConfirmButton: false });
+            } catch (e) {
+                Swal.fire('Error', 'Gagal menghapus', 'error');
+            }
+        }
+
+        async function testScheduledJob(id) {
+            try {
+                Swal.fire({ title: 'Mengirim test...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+                const res = await fetch(`/ api / admin / scheduled - jobs / ${id}/test`, { method: 'POST' });
+                const data = await res.json();
+                if (res.ok) {
+                    Swal.fire({ icon: 'success', title: 'Test Terkirim!', text: 'Cek Telegram Anda untuk preview' });
+                } else {
+                    Swal.fire('Error', data.error || 'Gagal mengirim test', 'error');
+                }
+            } catch (e) {
+                Swal.fire('Error', 'Koneksi gagal', 'error');
+            }
+        }
+
+        async function toggleJobStatus(id, enabled) {
+            try {
+                await fetch(`/api/admin/scheduled-jobs/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ enabled })
+                });
+                loadScheduledJobs();
+            } catch (e) {
+                Swal.fire('Error', 'Gagal mengubah status', 'error');
+            }
+        }
+
+        document.getElementById('jobForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('editJobId').value;
+            const type = document.getElementById('jobScheduleType').value;
+
+            let schedule = { type, time: document.getElementById('jobTime').value };
+            if (type === 'monthly_date') schedule.day = parseInt(document.getElementById('jobDay').value);
+            if (type === 'weekly_day') schedule.day = document.getElementById('jobWeekDay').value;
+            if (type === 'once') schedule.date = document.getElementById('jobOnceDate').value;
+
+            // Collect selected user IDs from checkboxes
+            const selectedUserIds = [];
+            document.querySelectorAll('.job-target-user:checked').forEach(cb => {
+                selectedUserIds.push(cb.value);
+            });
+
+            const data = {
+                name: document.getElementById('jobName').value,
+                message: document.getElementById('jobMessage').value,
+                schedule,
+                targets: { user_ids: selectedUserIds }
+            };
+
+            try {
+                const res = await fetch(id ? `/api/admin/scheduled-jobs/${id}` : '/api/admin/scheduled-jobs', {
+                    method: id ? 'PUT' : 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                if (res.ok) {
+                    closeScheduledJobModal();
+                    loadScheduledJobs();
+                    Swal.fire({ icon: 'success', title: 'Tersimpan!', timer: 1500, showConfirmButton: false });
+                } else {
+                    const err = await res.json();
+                    Swal.fire('Error', err.error || 'Gagal', 'error');
+                }
+            } catch (e) {
+                Swal.fire('Error', 'Koneksi gagal', 'error');
+            }
+        });
+
+        // Admin Backup Download
+        function downloadBackup() {
+            Swal.fire({
+                title: 'Download Backup',
+                text: 'Semua data (users, overtime, income, jadwal) akan didownload sebagai file JSON.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: '<i class="fas fa-download mr-2"></i>Download',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#3b82f6'
+            }).then(result => {
+                if (result.isConfirmed) {
+                    window.location.href = '/api/admin/backup';
+                    Swal.fire({ icon: 'success', title: 'Download dimulai!', timer: 1500, showConfirmButton: false });
+                }
+            });
+        }
+
+        async function logout() { await fetch('/api/logout', { method: 'POST' }); window.location.href = '/login'; }
+
+        // ==================== AUTO BACKUP ====================
+        async function loadAutoBackup() {
+            try {
+                const config = await fetch('/api/admin/autobackup').then(r => r.json());
+                document.getElementById('autoBackupEnabled').checked = config.enabled;
+                document.getElementById('autoBackupSchedule').value = config.schedule || 'daily';
+                document.getElementById('autoBackupDay').value = config.dayOfWeek || 'Senin';
+                document.getElementById('autoBackupTime').value = config.time || '00:00';
+                updateAutoBackupUI();
+                updateAutoBackupStatus(config);
+            } catch (e) { console.error(e); }
+        }
+
+        function updateAutoBackupStatus(config) {
+            const status = document.getElementById('autoBackupStatus');
+            if (config.enabled) {
+                let scheduleText = config.schedule === 'weekly'
+                    ? `Tiap ${config.dayOfWeek} jam ${config.time}`
+                    : `Tiap hari jam ${config.time}`;
+                status.textContent = scheduleText;
+                status.className = 'text-sm text-green-600 font-medium';
+            } else {
+                status.textContent = 'Nonaktif';
+                status.className = 'text-sm text-gray-500';
+            }
+        }
+
+        function updateAutoBackupUI() {
+            const schedule = document.getElementById('autoBackupSchedule').value;
+            document.getElementById('autoBackupDayWrapper').classList.toggle('hidden', schedule !== 'weekly');
+        }
+
+        function toggleAutoBackup() {
+            saveAutoBackupSettings();
+        }
+
+        async function saveAutoBackupSettings() {
+            const config = {
+                enabled: document.getElementById('autoBackupEnabled').checked,
+                schedule: document.getElementById('autoBackupSchedule').value,
+                dayOfWeek: document.getElementById('autoBackupDay').value,
+                time: document.getElementById('autoBackupTime').value
+            };
+            try {
+                const res = await fetch('/api/admin/autobackup', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(config)
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    updateAutoBackupStatus(data.config);
+                    Swal.fire({ icon: 'success', title: 'Tersimpan!', timer: 1500, showConfirmButton: false });
+                } else {
+                    const e = await res.json();
+                    Swal.fire('Error', e.error || 'Gagal', 'error');
+                }
+            } catch (e) { Swal.fire('Error', 'Koneksi gagal', 'error'); }
+        }
+
+        async function sendBackupNow() {
+            Swal.fire({ title: 'Mengirim...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            try {
+                const res = await fetch('/api/admin/autobackup/send-now', { method: 'POST' });
+                if (res.ok) {
+                    Swal.fire({ icon: 'success', title: 'Terkirim!', text: 'Backup dikirim ke Telegram admin', timer: 2000, showConfirmButton: false });
+                } else {
+                    const e = await res.json();
+                    Swal.fire('Error', e.error || 'Gagal mengirim', 'error');
+                }
+            } catch (e) { Swal.fire('Error', 'Koneksi gagal', 'error'); }
+        }
+
+        // Admin Restore
+        function restoreBackup() {
+            document.getElementById('restoreFileInput').click();
+        }
+
+        document.getElementById('restoreFileInput')?.addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async (ev) => {
+                try {
+                    const data = JSON.parse(ev.target.result);
+
+                    const result = await Swal.fire({
+                        title: 'Restore Data?',
+                        text: 'Semua data saat ini akan DIGANTI dengan data dari backup. Tindakan ini tidak dapat dibatalkan!',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Ya, Restore',
+                        confirmButtonColor: '#ef4444',
+                        cancelButtonText: 'Batal'
+                    });
+
+                    if (result.isConfirmed) {
+                        Swal.fire({ title: 'Restoring...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+                        const res = await fetch('/api/admin/restore', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(data)
+                        });
+
+                        const resData = await res.json();
+                        if (res.ok) {
+                            await Swal.fire('Berhasil', 'Data berhasil direstore!', 'success');
+                            window.location.reload();
+                        } else {
+                            Swal.fire('Error', resData.error || 'Gagal restore', 'error');
+                        }
+                    }
+                } catch (err) {
+                    console.error(err);
+                    Swal.fire('Error', 'File backup tidak valid', 'error');
+                }
+                document.getElementById('restoreFileInput').value = '';
+            };
+            reader.readAsText(file);
+        });
+
+
+        // ==================== WA BOT FUNCTIONS ====================
+
+        async function loadWaBotConfig() {
+            try {
+                const res = await fetch('/api/admin/wabot/config');
+                if (res.ok) {
+                    const data = await res.json();
+                    document.getElementById('wabotPrefix').value = data.prefix || '!';
+                    document.getElementById('wabotName').value = data.botName || '';
+                    document.getElementById('wabotSuperAdmin').value = data.superAdminNumber || '';
+
+                    // Update status display
+                    document.getElementById('wabotStatusPrefix').textContent = data.prefix || '!';
+                    document.getElementById('wabotStatusGemini').textContent = data.geminiApiKey ? '✅ Aktif' : '❌ Belum';
+                    document.getElementById('wabotStatusGemini').className = data.geminiApiKey ? 'text-lg font-bold text-green-600' : 'text-lg font-bold text-red-500';
+                    document.getElementById('wabotStatusAdmins').textContent = data.adminList?.length || 0;
+
+                    // Render admin list
+                    renderWaBotAdminList(data.adminList || []);
+                }
+            } catch (e) { console.error('Load WA Bot config error:', e); }
+        }
+
+        function renderWaBotAdminList(admins) {
+            const container = document.getElementById('wabotAdminList');
+            const emptyState = document.getElementById('wabotAdminEmpty');
+
+            if (admins.length === 0) {
+                container.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            container.innerHTML = admins.map(phone => `
+                <div class="flex items-center justify-between bg-gray-50 rounded-xl px-4 py-3">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-user-shield text-green-500"></i>
+                        <span class="font-mono">${phone}</span>
+                    </div>
+                    <button onclick="removeWaBotAdmin('${phone}')" class="text-red-500 hover:text-red-700 transition-colors">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        async function saveWaBotConfig() {
+            const config = {
+                prefix: document.getElementById('wabotPrefix').value || '!',
+                botName: document.getElementById('wabotName').value || 'Bot Lembur',
+                superAdminNumber: document.getElementById('wabotSuperAdmin').value,
+                geminiApiKey: document.getElementById('wabotGeminiKey').value
+            };
+
+            // Don't send empty or placeholder gemini key
+            if (!config.geminiApiKey || config.geminiApiKey === '***configured***') {
+                delete config.geminiApiKey;
+            }
+
+            try {
+                Swal.fire({ title: 'Menyimpan...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+                const res = await fetch('/api/admin/wabot/config', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(config)
+                });
+
+                if (res.ok) {
+                    await loadWaBotConfig();
+                    document.getElementById('wabotGeminiKey').value = ''; // Clear sensitive field
+                    Swal.fire({ icon: 'success', title: 'Tersimpan!', timer: 1500, showConfirmButton: false });
+                } else {
+                    const e = await res.json();
+                    Swal.fire('Error', e.error || 'Gagal menyimpan', 'error');
+                }
+            } catch (e) { Swal.fire('Error', 'Koneksi gagal', 'error'); }
+        }
+
+        async function addWaBotAdmin() {
+            const phone = document.getElementById('wabotNewAdmin').value.trim();
+            if (!phone) {
+                Swal.fire('Error', 'Masukkan nomor WA', 'warning');
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/admin/wabot/admin', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone })
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    document.getElementById('wabotNewAdmin').value = '';
+                    renderWaBotAdminList(data.adminList);
+                    document.getElementById('wabotStatusAdmins').textContent = data.adminList.length;
+                    Swal.fire({ icon: 'success', title: 'Admin ditambahkan!', text: data.phone, timer: 1500, showConfirmButton: false });
+                } else {
+                    const e = await res.json();
+                    Swal.fire('Error', e.error || 'Gagal', 'error');
+                }
+            } catch (e) { Swal.fire('Error', 'Koneksi gagal', 'error'); }
+        }
+
+        async function removeWaBotAdmin(phone) {
+            const result = await Swal.fire({
+                title: 'Hapus Admin?',
+                text: `Hapus ${phone} dari daftar admin?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Hapus',
+                confirmButtonColor: '#ef4444',
+                cancelButtonText: 'Batal'
+            });
+
+            if (!result.isConfirmed) return;
+
+            try {
+                const res = await fetch(`/api/admin/wabot/admin/${phone}`, { method: 'DELETE' });
+                if (res.ok) {
+                    const data = await res.json();
+                    renderWaBotAdminList(data.adminList);
+                    document.getElementById('wabotStatusAdmins').textContent = data.adminList.length;
+                    Swal.fire({ icon: 'success', title: 'Dihapus!', timer: 1500, showConfirmButton: false });
+                } else {
+                    const e = await res.json();
+                    Swal.fire('Error', e.error || 'Gagal', 'error');
+                }
+            } catch (e) { Swal.fire('Error', 'Koneksi gagal', 'error'); }
+        }
+
+        init();
+    </script>
+    <input type="file" id="restoreFileInput" class="hidden" accept=".json">
+</body>
+
+</html>

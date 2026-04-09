@@ -1,0 +1,14 @@
+{
+  "botToken": "7861018703:AAHJm5CyZZvi2D9QIrkK1504gnUfQuGw6WM",
+  "companyName": "PT. ABCD",
+  "webUrl": "http://localhost:3000",
+  "defaultSalary": 5307094,
+  "defaultMealAllowance": 30000,
+  "sessionSecret": "overtime-secret-key-2024",
+  "autoBackup": {
+    "enabled": true,
+    "schedule": "daily",
+    "time": "11:20",
+    "dayOfWeek": "Senin"
+  }
+}
