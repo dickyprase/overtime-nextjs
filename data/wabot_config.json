@@ -1,11 +1,9 @@
 {
   "prefix": "!",
   "botName": "Bot Lembur",
-  "geminiApiKey": "AIzaSyBhUe08ti_UwwwKF9Vo-j743oBj3ZySJVk",
-  "superAdminNumber": "089685259671",
-  "superAdminLid": "4978051694750@lid",
-  "adminList": [
-    "6289685259671"
-  ],
+  "geminiApiKey": "",
+  "superAdminNumber": "",
+  "superAdminLid": "",
+  "adminList": [],
   "adminLidList": []
 }
